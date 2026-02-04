@@ -171,6 +171,7 @@ export function POSCart({
                             }
                           }}
                           className="w-24 h-7 text-sm bg-white text-gray-900 border-2 border-blue-500"
+                          tabIndex={3}
                           autoFocus
                         />
                       ) : (
@@ -205,7 +206,7 @@ export function POSCart({
                     onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
                     className="flex-1 bg-red-600 hover:bg-red-700 text-white p-2 rounded font-bold transition-colors"
                     disabled={loading}
-                    tabIndex={3}
+                    tabIndex={5}
                   >
                     <Minus size={16} className="mx-auto" />
                   </button>
@@ -221,13 +222,13 @@ export function POSCart({
                     }}
                     onFocus={(e) => e.target.select()}
                     className="w-16 text-center font-bold text-lg h-10 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900"
-                    tabIndex={3}
+                    tabIndex={4}
                   />
                   <button
                     onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white p-2 rounded font-bold transition-colors"
                     disabled={loading}
-                    tabIndex={3}
+                    tabIndex={6}
                   >
                     <Plus size={16} className="mx-auto" />
                   </button>
