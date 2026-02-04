@@ -206,7 +206,7 @@ export function POSCart({
                     onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
                     className="flex-1 bg-red-600 hover:bg-red-700 text-white p-2 rounded font-bold transition-colors"
                     disabled={loading}
-                    tabIndex={5}
+                    tabIndex={-1}
                   >
                     <Minus size={16} className="mx-auto" />
                   </button>
@@ -228,7 +228,7 @@ export function POSCart({
                     onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white p-2 rounded font-bold transition-colors"
                     disabled={loading}
-                    tabIndex={6}
+                    tabIndex={-1}
                   >
                     <Plus size={16} className="mx-auto" />
                   </button>
