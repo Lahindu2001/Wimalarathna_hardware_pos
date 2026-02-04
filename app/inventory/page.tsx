@@ -17,8 +17,10 @@ interface Product {
   stock: number
 }
 
-interface EditingProduct extends Product {
-  isEditing?: boolean
+interface EditingProduct {
+  name?: string
+  price?: string | number
+  stock?: string | number
 }
 
 export default function InventoryPage() {
@@ -26,7 +28,7 @@ export default function InventoryPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [editingId, setEditingId] = useState<number | null>(null)
-  const [editValues, setEditValues] = useState<Partial<EditingProduct>>({})
+  const [editValues, setEditValues] = useState<EditingProduct>({})
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
   const [searchQuery, setSearchQuery] = useState('')
