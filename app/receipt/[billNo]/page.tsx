@@ -113,15 +113,23 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               }
               
               .border-t-2 {
-                border-top: 2px solid #000;
+                border-top: 2px solid #1f2937;
               }
               
               .border-dashed {
                 border-style: dashed;
               }
               
-              .border-black {
-                border-color: #000;
+              .border-gray-800 {
+                border-color: #1f2937;
+              }
+              
+              .border-gray-700 {
+                border-color: #374151;
+              }
+              
+              .text-gray-900 {
+                color: #111827;
               }
               
               .pb-3 { padding-bottom: 12px; }
@@ -291,11 +299,11 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
         {/* Thermal Receipt Style - 80mm width */}
         <div
           ref={receiptRef}
-          className="bg-white text-black mx-auto font-mono leading-tight border-2 border-gray-300 shadow-lg"
+          className="bg-white text-gray-900 mx-auto font-mono leading-tight border-2 border-gray-300 shadow-lg"
           style={{ width: '80mm', padding: '8mm', fontSize: '11px' }}
         >
           {/* Header */}
-          <div className="text-center border-b-2 border-black pb-3 mb-3">
+          <div className="text-center border-b-2 border-gray-800 pb-3 mb-3">
             <h1 className="font-bold uppercase" style={{ fontSize: '18px', letterSpacing: '1px' }}>
               WIMALARATHNE HARDWARE
             </h1>
@@ -327,7 +335,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Customer Details */}
-          <div className="border-t border-b border-dashed border-black py-2 mb-3" style={{ fontSize: '11px' }}>
+          <div className="border-t border-b border-dashed border-gray-700 py-2 mb-3" style={{ fontSize: '11px' }}>
             <div className="mb-1">
               <span className="font-bold">Customer Name : </span>
               <span>{receipt.customerName}</span>
@@ -336,7 +344,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
 
           {/* Items Table */}
           <div className="mb-3">
-            <div className="border-b-2 border-black pb-1 mb-2 font-bold" style={{ fontSize: '11px' }}>
+            <div className="border-b-2 border-gray-800 pb-1 mb-2 font-bold" style={{ fontSize: '11px' }}>
               <div className="flex">
                 <span className="flex-1">Item</span>
                 <span style={{ width: '35px', textAlign: 'center' }}>Qty</span>
@@ -364,7 +372,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Summary Section */}
-          <div className="border-t-2 border-black pt-2 mb-3" style={{ fontSize: '11px' }}>
+          <div className="border-t-2 border-gray-800 pt-2 mb-3" style={{ fontSize: '11px' }}>
             <div className="flex justify-between mb-1">
               <span>Subtotal:</span>
               <span className="font-bold">Rs. {Number(receipt.totalAmount).toFixed(2)}</span>
@@ -378,7 +386,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Grand Total */}
-          <div className="border-2 border-black p-2 mb-3 text-center">
+          <div className="border-2 border-gray-800 p-2 mb-3 text-center">
             <div className="text-xs mb-1">GRAND TOTAL</div>
             <div className="font-bold" style={{ fontSize: '16px' }}>
               Rs. {Number(receipt.totalAmount).toFixed(2)}
@@ -386,7 +394,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Footer */}
-          <div className="text-center border-t border-dashed border-black pt-3" style={{ fontSize: '10px' }}>
+          <div className="text-center border-t border-dashed border-gray-700 pt-3" style={{ fontSize: '10px' }}>
             <p className="mb-2 font-semibold">Thank You For Your Purchase!</p>
             <p className="mb-1">Please retain this receipt for warranty claims</p>
             <p className="text-xs mt-2">

@@ -1,6 +1,8 @@
 # Professional Color Scheme Guide
 ## Wimalarathne Hardware POS System
 
+> **⚠️ IMPORTANT:** Never use pure black (#000000). Always use professional dark grays for better visual design and reduced eye strain.
+
 ### 🎨 Primary Colors
 
 #### Blue (Primary Brand Color)
@@ -52,12 +54,12 @@
 
 ---
 
-### 📝 Text Colors (Gray Scale)
+### 📝 Text Colors (Gray Scale - Never Use Black!)
 
 #### Gray (Text & Backgrounds)
-- **gray-900** `#111827` - Primary text, headings, input text
-- **gray-800** `#1f2937` - Secondary headings, table text
-- **gray-700** `#374151` - Labels
+- **gray-900** `#111827` - **PRIMARY TEXT** (Use instead of black), headings, input text
+- **gray-800** `#1f2937` - **SECONDARY HEADINGS**, strong borders, table text
+- **gray-700** `#374151` - **LABELS**, medium borders, dashed lines
 - **gray-600** `#4b5563` - Secondary text, descriptions
 - **gray-400** `#9ca3af` - Placeholder text, icons
 - **gray-300** `#d1d5db` - Borders, dividers
@@ -65,11 +67,19 @@
 - **gray-100** `#f3f4f6` - Light backgrounds, hover states
 - **gray-50** `#f9fafb` - Page backgrounds
 
+**⚠️ NO BLACK RULE:**
+- ❌ NEVER use `#000000` or pure black
+- ✅ ALWAYS use `gray-900` (#111827) for darkest text
+- ✅ Use `gray-800` (#1f2937) for strong borders
+- ✅ Use `gray-700` (#374151) for dashed borders
+
 **Usage:**
-- Main text: `text-gray-900`
+- Main text: `text-gray-900` (NOT black!)
+- Strong borders: `border-gray-800` (NOT black!)
+- Dashed lines: `border-gray-700` (NOT black!)
 - Labels: `text-gray-900 font-semibold`
 - Placeholders: `placeholder:text-gray-400`
-- Borders: `border-gray-300`
+- Regular borders: `border-gray-300`
 - Page background: `bg-gray-50`
 - Card backgrounds: `bg-white`
 - Table rows hover: `hover:bg-gray-50`
@@ -223,30 +233,37 @@ disabled:opacity-50 disabled:cursor-not-allowed
 
 ### ✨ Best Practices
 
-1. **Consistency**: Always use the same color for the same action
+1. **NO BLACK POLICY**: 
+   - ❌ NEVER use pure black (#000000 or `bg-black`, `text-black`, `border-black`)
+   - ✅ ALWAYS use gray-900 for darkest elements
+   - ✅ Use gray-800 for strong borders and emphasis
+   - **Reason**: Pure black creates harsh contrast and eye strain. Professional designs use dark grays.
+
+2. **Consistency**: Always use the same color for the same action
    - Add/Create: Green-600
    - Edit: Blue-600
    - Delete/Remove: Red-600
    - Cancel: Gray-300 outline
 
-2. **Accessibility**: Ensure proper contrast ratios
+3. **Accessibility**: Ensure proper contrast ratios
    - Dark text (gray-900) on white backgrounds
    - White text on blue-600/green-600/red-600 backgrounds
 
-3. **Visual Hierarchy**:
+4. **Visual Hierarchy**:
    - Primary actions: Solid blue-600
    - Secondary actions: Outline buttons
    - Destructive actions: Solid red-600
 
-4. **Spacing**: Use consistent padding and margins
+5. **Spacing**: Use consistent padding and margins
    - Page padding: `p-6`
    - Card padding: `p-4` or `p-6`
    - Button gaps: `gap-2` or `gap-3`
 
-5. **Borders**: Use 2px borders for important interactive elements
+6. **Borders**: Use 2px borders for important interactive elements
    - Inputs: `border-2 border-gray-300`
    - Cards: `border border-gray-200`
    - Focus: `border-2 border-blue-600`
+   - Strong dividers: `border-2 border-gray-800`
 
 ---
 
