@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useRef } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -27,6 +27,19 @@ export function POSProducts({
 }: POSProductsProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const searchRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Focus search on Space bar (when not typing in an input)
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault()
+        searchRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [])
 
   const filteredProducts = useMemo(
     () =>
@@ -66,7 +79,7 @@ export function POSProducts({
           <Input
             ref={searchRef}
             type="text"
-            placeholder="Search by Product ID or Name... (Press Enter to add)"
+            placeholder="Search by Product ID or Name... (Press Space or Enter)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-12 text-base text-gray-900 placeholder:text-gray-400 bg-white border-2 border-gray-300 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -37,9 +37,23 @@ export default function HistoryPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchBills()
+  }, [])
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Focus search on Space bar (when not typing in an input)
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault()
+        searchRef.current?.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
   }, [])
 
   const fetchBills = async () => {
@@ -150,8 +164,9 @@ export default function HistoryPage() {
             <div className="relative">
               <Search className="absolute left-3 top-3 text-gray-400" size={20} />
               <Input
+                ref={searchRef}
                 type="text"
-                placeholder="Search by bill number or customer name..."
+                placeholder="Search by bill number or customer name... (Press Space)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"

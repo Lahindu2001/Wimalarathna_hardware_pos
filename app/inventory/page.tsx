@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -32,6 +32,7 @@ export default function InventoryPage() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
   const [searchQuery, setSearchQuery] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetchProducts()
@@ -43,6 +44,11 @@ export default function InventoryPage() {
       if (e.shiftKey && (e.key === '+' || e.key === '=')) {
         e.preventDefault()
         setShowAddDialog(true)
+      }
+      // Focus search on Space bar (when not typing in an input)
+      if (e.code === 'Space' && e.target === document.body) {
+        e.preventDefault()
+        searchRef.current?.focus()
       }
     }
 
@@ -187,8 +193,9 @@ export default function InventoryPage() {
         <Card className="p-6 bg-white shadow-md">
           <div className="mb-6">
             <Input
+              ref={searchRef}
               type="text"
-              placeholder="Search products..."
+              placeholder="Search products... (Press Space)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
