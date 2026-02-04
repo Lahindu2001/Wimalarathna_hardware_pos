@@ -102,7 +102,7 @@ export default function AuthPage() {
               placeholder="Enter username"
               disabled={loading}
               required
-              className="h-11 border-gray-300 focus:border-blue-600 focus:ring-blue-600"
+              className="h-11 border-gray-300 focus:border-blue-600 focus:ring-blue-600 text-gray-900 bg-white placeholder:text-gray-400"
             />
           </div>
 
@@ -116,7 +116,7 @@ export default function AuthPage() {
               placeholder="Enter password"
               disabled={loading}
               required
-              className="h-11 border-gray-300 focus:border-blue-600 focus:ring-blue-600"
+              className="h-11 border-gray-300 focus:border-blue-600 focus:ring-blue-600 text-gray-900 bg-white placeholder:text-gray-400"
             />
           </div>
 
