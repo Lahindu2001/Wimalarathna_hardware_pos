@@ -154,7 +154,7 @@ export default function HistoryPage() {
                 placeholder="Search by bill number or customer name..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 border-2 border-gray-300 focus:border-blue-500"
+                className="pl-10 h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
             </div>
 

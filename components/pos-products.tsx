@@ -69,7 +69,7 @@ export function POSProducts({
             placeholder="Search by Product ID or Name... (Press Enter to add)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-3 text-base text-gray-900 placeholder:text-gray-400 bg-white border-2 border-gray-300 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="pl-10 h-12 text-base text-gray-900 placeholder:text-gray-400 bg-white border-2 border-gray-300 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"
             tabIndex={1}
             autoFocus
           />
