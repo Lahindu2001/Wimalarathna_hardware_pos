@@ -1,0 +1,305 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { POSProducts } from '@/components/pos-products'
+import { POSCart } from '@/components/pos-cart'
+import { Button } from '@/components/ui/button'
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { LogOut, BarChart3, Package, HelpCircle, Users } from 'lucide-react'
+import { KeyboardHelp } from '@/components/keyboard-help'
+
+interface Product {
+  id: number
+  name: string
+  price: number
+  stock: number
+}
+
+interface CartItem extends Product {
+  quantity: number
+}
+
+export default function POSPage() {
+  const router = useRouter()
+  const [products, setProducts] = useState<Product[]>([])
+  const [cart, setCart] = useState<CartItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [showHelpDialog, setShowHelpDialog] = useState(false)
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch('/api/products')
+      if (!res.ok) throw new Error('Failed to fetch products')
+      const data = await res.json()
+      setProducts(data)
+    } catch (error) {
+      console.error('[v0] Failed to fetch products:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddToCart = (product: Product) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.id === product.id)
+      if (existingItem) {
+        if (existingItem.quantity < product.stock) {
+          return prevCart.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+        }
+        return prevCart
+      }
+      return [...prevCart, { ...product, quantity: 1 }]
+    })
+  }
+
+  const handleUpdateQuantity = (id: number, quantity: number) => {
+    if (quantity <= 0) {
+      handleRemoveFromCart(id)
+      return
+    }
+    const product = products.find((p) => p.id === id)
+    if (product && quantity <= product.stock) {
+      setCart((prevCart) =>
+        prevCart.map((item) =>
+          item.id === id ? { ...item, quantity } : item
+        )
+      )
+    }
+  }
+
+  const handleUpdatePrice = (id: number, price: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id ? { ...item, price } : item
+      )
+    )
+  }
+
+  const handleRemoveFromCart = (id: number) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== id))
+  }
+
+  const handleCheckout = async (customerName: string) => {
+    if (cart.length === 0) return
+
+    setCheckoutLoading(true)
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName,
+          items: cart,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Checkout failed')
+
+      const data = await res.json()
+      
+      // Store receipt data in session storage
+      sessionStorage.setItem(`receipt_${data.billNo}`, JSON.stringify(data))
+      
+      // Redirect to receipt page
+      router.push(`/receipt/${data.billNo}`)
+      
+      // Reset cart
+      setCart([])
+      
+      // Refresh products to update stock
+      fetchProducts()
+    } catch (error) {
+      console.error('[v0] Checkout error:', error)
+      alert('Checkout failed. Please try again.')
+    } finally {
+      setCheckoutLoading(false)
+    }
+  }
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/logout', { method: 'POST' })
+      router.push('/auth')
+    } catch (error) {
+      console.error('[v0] Logout error:', error)
+    }
+  }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // F9 for checkout - works from anywhere
+      if (e.key === 'F9' && cart.length > 0) {
+        e.preventDefault()
+        const customerName = prompt('Enter customer name:')
+        if (customerName !== null) {
+          handleCheckout(customerName || 'Walk-in')
+        }
+        return
+      }
+
+      // Prevent other shortcuts when typing in input fields
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return
+      }
+
+      // Ctrl+L for logout
+      if (e.ctrlKey && e.key === 'l') {
+        e.preventDefault()
+        setShowLogoutDialog(true)
+      }
+      // Ctrl+H for history
+      if (e.ctrlKey && e.key === 'h') {
+        e.preventDefault()
+        router.push('/history')
+      }
+      // Ctrl+I for inventory
+      if (e.ctrlKey && e.key === 'i') {
+        e.preventDefault()
+        router.push('/inventory')
+      }
+      // Ctrl+? for help
+      if (e.ctrlKey && e.shiftKey && e.key === '?') {
+        e.preventDefault()
+        setShowHelpDialog(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [router, cart])
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-foreground">Loading POS...</p>
+        </div>
+      </main>
+    )
+  }
+
+  return (
+    <main className="min-h-screen bg-gray-50 flex flex-col">
+      {/* Top Bar */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">
+                Wimalarathne Hardware
+              </h1>
+              <p className="text-blue-100 text-sm">213/1F, Medalanda, Dompe | Phone: 0778-683-489</p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowHelpDialog(true)}
+                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                size="sm"
+              >
+                <HelpCircle size={16} />
+                Help
+                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+?</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/admin/users')}
+                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                size="sm"
+              >
+                <Users size={16} />
+                Admin
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/inventory')}
+                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                size="sm"
+              >
+                <Package size={16} />
+                Inventory
+                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+I</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => router.push('/history')}
+                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                size="sm"
+              >
+                <BarChart3 size={16} />
+                History
+                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+H</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setShowLogoutDialog(true)}
+                className="gap-2 bg-red-600 text-white border-red-500 hover:bg-red-700"
+                size="sm"
+              >
+                <LogOut size={16} />
+                Logout
+                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+L</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex gap-0 overflow-hidden">
+        {/* Products Section - Left */}
+        <div className="flex-1 bg-white border-r">
+          <POSProducts
+            products={products}
+            onAddToCart={handleAddToCart}
+            loading={checkoutLoading}
+          />
+        </div>
+        
+        {/* Cart Section - Right */}
+        <div className="w-96 bg-gray-50 shadow-xl">
+          <POSCart
+            items={cart}
+            onUpdateQuantity={handleUpdateQuantity}
+            onUpdatePrice={handleUpdatePrice}
+            onRemove={handleRemoveFromCart}
+            onCheckout={handleCheckout}
+            loading={checkoutLoading}
+          />
+        </div>
+      </div>
+
+      {/* Help Dialog */}
+      <KeyboardHelp open={showHelpDialog} onOpenChange={setShowHelpDialog} />
+
+      {/* Logout Dialog */}
+      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to logout? (Ctrl+L)
+          </AlertDialogDescription>
+          <div className="flex gap-3">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleLogout}>
+              Logout
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+    </main>
+  )
+}

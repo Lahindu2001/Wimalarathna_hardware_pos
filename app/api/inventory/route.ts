@@ -1,0 +1,80 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { query } from '@/lib/db'
+import { getCurrentUser } from '@/lib/auth'
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { name, price, stock } = await request.json()
+
+    if (!name || !price || stock === undefined) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      )
+    }
+
+    const result = await query(
+      'INSERT INTO products (name, price, stock) VALUES ($1, $2, $3) RETURNING *',
+      [name, price, stock]
+    )
+
+    return NextResponse.json(result.rows[0])
+  } catch (error) {
+    console.error('[v0] Inventory POST error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    const user = await getCurrentUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    const { id, name, price, stock } = await request.json()
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Product ID required' },
+        { status: 400 }
+      )
+    }
+
+    const result = await query(
+      'UPDATE products SET name = $1, price = $2, stock = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+      [name, price, stock, id]
+    )
+
+    if (result.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json(result.rows[0])
+  } catch (error) {
+    console.error('[v0] Inventory PUT error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
