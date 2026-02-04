@@ -191,7 +191,7 @@ export default function InventoryPage() {
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="border-2 border-gray-300 focus:border-blue-500"
+              className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
             />
           </div>
 
@@ -227,7 +227,7 @@ export default function InventoryPage() {
                                 name: e.target.value,
                               })
                             }
-                            className="w-full border-2 border-blue-500"
+                            className="border-2 border-blue-500 bg-white text-gray-900"
                           />
                         ) : (
                           product.name
@@ -237,6 +237,7 @@ export default function InventoryPage() {
                         {editingId === product.id ? (
                           <Input
                             type="number"
+                            step="0.01"
                             value={editValues.price || ''}
                             onChange={(e) =>
                               setEditValues({
@@ -244,7 +245,7 @@ export default function InventoryPage() {
                                 price: e.target.value,
                               })
                             }
-                            className="w-24 text-right border-2 border-blue-500"
+                            className="w-24 text-right border-2 border-blue-500 bg-white text-gray-900"
                           />
                         ) : (
                           Number(product.price).toFixed(2)
@@ -261,7 +262,7 @@ export default function InventoryPage() {
                                 stock: e.target.value,
                               })
                             }
-                            className="w-24 text-right"
+                            className="w-24 text-right border-2 border-blue-500 bg-white text-gray-900"
                           />
                         ) : (
                           <span
@@ -324,17 +325,17 @@ export default function InventoryPage() {
 
       {/* Add Product Dialog */}
       <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent className="bg-white">
+        <DialogContent className="bg-white border-gray-200 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Add New Product</DialogTitle>
-            <DialogDescription className="text-gray-600">
+            <DialogTitle className="text-2xl font-bold text-gray-900">Add New Product</DialogTitle>
+            <DialogDescription className="text-gray-600 mt-1">
               Add a new product to the inventory
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-700 font-medium">Product Name</Label>
+              <Label htmlFor="name" className="text-gray-900 font-semibold">Product Name</Label>
               <Input
                 id="name"
                 value={newProduct.name}
@@ -342,26 +343,27 @@ export default function InventoryPage() {
                   setNewProduct({ ...newProduct, name: e.target.value })
                 }
                 placeholder="e.g., Hammer 500g"
-                className="border-2 border-gray-300 focus:border-blue-500"
+                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="price" className="text-gray-700 font-medium">Price (Rs.)</Label>
+              <Label htmlFor="price" className="text-gray-900 font-semibold">Price (Rs.)</Label>
               <Input
                 id="price"
                 type="number"
+                step="0.01"
                 value={newProduct.price}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, price: e.target.value })
                 }
                 placeholder="450.00"
-                className="border-2 border-gray-300 focus:border-blue-500"
+                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stock" className="text-gray-700 font-medium">Stock Quantity</Label>
+              <Label htmlFor="stock" className="text-gray-900 font-semibold">Stock Quantity</Label>
               <Input
                 id="stock"
                 type="number"
@@ -370,21 +372,21 @@ export default function InventoryPage() {
                   setNewProduct({ ...newProduct, stock: e.target.value })
                 }
                 placeholder="25"
-                className="border-2 border-gray-300 focus:border-blue-500"
+                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
             </div>
 
-            <div className="flex gap-2 pt-4">
+            <div className="flex gap-3 pt-4">
               <Button
                 variant="outline"
                 onClick={() => setShowAddDialog(false)}
-                className="flex-1 border-2 border-gray-300 hover:bg-gray-100"
+                className="flex-1 h-11 border-2 border-gray-300 hover:bg-gray-100 text-gray-900 font-medium"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleAddProduct}
-                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white font-semibold"
               >
                 Add Product
               </Button>

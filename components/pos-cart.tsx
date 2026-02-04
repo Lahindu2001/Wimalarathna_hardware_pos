@@ -169,7 +169,7 @@ export function POSCart({
                               setPriceValue('')
                             }
                           }}
-                          className="w-24 h-7 text-sm"
+                          className="w-24 h-7 text-sm bg-white text-gray-900 border-2 border-blue-500"
                           autoFocus
                         />
                       ) : (
@@ -218,7 +218,7 @@ export function POSCart({
                         onUpdateQuantity(item.id, qty)
                       }
                     }}
-                    className="w-16 text-center font-bold text-lg h-10 border-2 border-gray-300 focus:border-blue-500"
+                    className="w-16 text-center font-bold text-lg h-10 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900"
                     tabIndex={3}
                   />
                   <button
