@@ -162,6 +162,7 @@ export function POSCart({
                           value={priceValue}
                           onChange={(e) => setPriceValue(e.target.value)}
                           onBlur={() => handlePriceSave(item.id)}
+                          onFocus={(e) => e.target.select()}
                           onKeyDown={(e) => {
                             if (e.key === 'Enter') handlePriceSave(item.id)
                             if (e.key === 'Escape') {
@@ -218,6 +219,7 @@ export function POSCart({
                         onUpdateQuantity(item.id, qty)
                       }
                     }}
+                    onFocus={(e) => e.target.select()}
                     className="w-16 text-center font-bold text-lg h-10 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900"
                     tabIndex={3}
                   />
