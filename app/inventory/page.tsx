@@ -45,8 +45,8 @@ export default function InventoryPage() {
         e.preventDefault()
         setShowAddDialog(true)
       }
-      // Focus search on Space bar (when not typing in an input)
-      if (e.code === 'Space' && e.target === document.body) {
+      // Focus search on Ctrl+/
+      if (e.ctrlKey && e.key === '/') {
         e.preventDefault()
         searchRef.current?.focus()
       }
@@ -195,7 +195,7 @@ export default function InventoryPage() {
             <Input
               ref={searchRef}
               type="text"
-              placeholder="Search products... (Press Space)"
+              placeholder="Search products... (Ctrl+/)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"

@@ -30,8 +30,8 @@ export function POSProducts({
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Focus search on Space bar (when not typing in an input)
-      if (e.code === 'Space' && e.target === document.body) {
+      // Focus search on Ctrl+/
+      if (e.ctrlKey && e.key === '/') {
         e.preventDefault()
         searchRef.current?.focus()
       }
@@ -79,7 +79,7 @@ export function POSProducts({
           <Input
             ref={searchRef}
             type="text"
-            placeholder="Search by Product ID or Name... (Press Space or Enter)"
+            placeholder="Search by Product ID or Name... (Ctrl+/ to focus, Enter to add)"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 h-12 text-base text-gray-900 placeholder:text-gray-400 bg-white border-2 border-gray-300 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200"

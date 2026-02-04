@@ -45,8 +45,8 @@ export default function HistoryPage() {
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // Focus search on Space bar (when not typing in an input)
-      if (e.code === 'Space' && e.target === document.body) {
+      // Focus search on Ctrl+/
+      if (e.ctrlKey && e.key === '/') {
         e.preventDefault()
         searchRef.current?.focus()
       }
@@ -166,7 +166,7 @@ export default function HistoryPage() {
               <Input
                 ref={searchRef}
                 type="text"
-                placeholder="Search by bill number or customer name... (Press Space)"
+                placeholder="Search by bill number or customer name... (Ctrl+/)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
