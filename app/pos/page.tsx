@@ -195,63 +195,63 @@ export default function POSPage() {
     <main className="min-h-screen bg-gray-50 flex flex-col">
       {/* Top Bar */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-3 md:px-6 py-3 md:py-4">
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="text-lg md:text-2xl font-bold">
                 Wimalarathne Hardware
               </h1>
-              <p className="text-blue-100 text-sm">213/1F, Medalanda, Dompe | Phone: 0778-683-489</p>
+              <p className="text-blue-100 text-xs md:text-sm">213/1F, Medalanda, Dompe | Phone: 0778-683-489</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-1 md:gap-2">
               <Button
                 variant="outline"
                 onClick={() => setShowHelpDialog(true)}
-                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
                 size="sm"
               >
                 <HelpCircle size={16} />
-                Help
-                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+?</span>
+                <span className="hidden md:inline">Help</span>
+                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+?</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push('/admin/users')}
-                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
                 size="sm"
               >
                 <Users size={16} />
-                Admin
+                <span className="hidden md:inline">Admin</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push('/inventory')}
-                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
                 size="sm"
               >
                 <Package size={16} />
-                Inventory
-                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+I</span>
+                <span className="hidden md:inline">Inventory</span>
+                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+I</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => router.push('/history')}
-                className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
                 size="sm"
               >
                 <BarChart3 size={16} />
-                History
-                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+H</span>
+                <span className="hidden md:inline">History</span>
+                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+H</span>
               </Button>
               <Button
                 variant="outline"
                 onClick={() => setShowLogoutDialog(true)}
-                className="gap-2 bg-red-600 text-white border-red-500 hover:bg-red-700"
+                className="gap-1 md:gap-2 bg-red-600 text-white border-red-500 hover:bg-red-700"
                 size="sm"
               >
                 <LogOut size={16} />
-                Logout
-                <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+L</span>
+                <span className="hidden md:inline">Logout</span>
+                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+L</span>
               </Button>
             </div>
           </div>
@@ -259,9 +259,9 @@ export default function POSPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex gap-0 overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
         {/* Products Section - Left */}
-        <div className="flex-1 bg-white border-r">
+        <div className="flex-1 bg-white lg:border-r order-2 lg:order-1">
           <POSProducts
             products={products}
             onAddToCart={handleAddToCart}
@@ -270,7 +270,7 @@ export default function POSPage() {
         </div>
         
         {/* Cart Section - Right */}
-        <div className="w-96 bg-gray-50 shadow-xl">
+        <div className="w-full lg:w-96 bg-gray-50 shadow-xl order-1 lg:order-2 max-h-[40vh] lg:max-h-none">
           <POSCart
             items={cart}
             onUpdateQuantity={handleUpdateQuantity}

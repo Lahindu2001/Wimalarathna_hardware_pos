@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
 import { Alert } from '@/components/ui/alert'
+import { ShoppingCart } from 'lucide-react'
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true)
@@ -62,20 +63,18 @@ export default function AuthPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 p-4">
-      <Card className="w-full max-w-md p-8 bg-white shadow-xl border-gray-200">
-        <div className="text-center mb-8">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-gray-100 p-3 md:p-4">
+      <Card className="w-full max-w-md p-6 md:p-8 bg-white shadow-xl border-gray-200">
+        <div className="text-center mb-6 md:mb-8">
           <div className="mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-full mx-auto flex items-center justify-center">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
+            <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-600 rounded-full mx-auto flex items-center justify-center">
+              <ShoppingCart className="w-7 h-7 md:w-8 md:h-8 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
             {isLogin ? 'Login' : 'Create Account'}
           </h1>
-          <p className="text-gray-600 mt-2 font-medium">
+          <p className="text-sm md:text-base text-gray-600 mt-2 font-medium">
             Wimalarathne Hardware
           </p>
         </div>

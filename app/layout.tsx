@@ -11,6 +11,7 @@ export const metadata: Metadata = {
   title: 'Wimalarathne Hardware POS',
   description: 'Professional Point of Sale system for hardware retail',
   generator: 'v0.app',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
   icons: {
     icon: [
       {

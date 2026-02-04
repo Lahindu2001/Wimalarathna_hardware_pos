@@ -90,7 +90,7 @@ export function POSProducts({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
           {filteredProducts.length === 0 ? (
             <div className="col-span-3 flex items-center justify-center text-gray-800 py-16">
               No products found

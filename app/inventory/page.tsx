@@ -160,28 +160,28 @@ export default function InventoryPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-6 py-4">
-          <div className="flex items-center gap-4">
+        <div className="px-3 md:px-6 py-3 md:py-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Button
               variant="outline"
               onClick={() => router.push('/pos')}
-              className="gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
+              className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
               size="sm"
             >
               <ArrowLeft size={18} />
-              Back to POS
+              <span className="hidden md:inline">Back to POS</span>
             </Button>
-            <h1 className="text-2xl font-bold flex-1">
+            <h1 className="text-lg md:text-2xl font-bold flex-1">
               Inventory Management
             </h1>
             <Button 
               onClick={() => setShowAddDialog(true)} 
-              className="gap-2 bg-green-600 hover:bg-green-700 text-white border-0"
+              className="gap-1 md:gap-2 bg-green-600 hover:bg-green-700 text-white border-0"
               size="sm"
             >
               <Plus size={18} />
-              Add Product
-              <span className="ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">
+              <span className="hidden md:inline">Add Product</span>
+              <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">
                 Shift++
               </span>
             </Button>
@@ -189,8 +189,8 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      <div className="p-6 max-w-7xl mx-auto">
-        <Card className="p-6 bg-white shadow-md">
+      <div className="p-3 md:p-6 max-w-7xl mx-auto">
+        <Card className="p-3 md:p-6 bg-white shadow-md">
           <div className="mb-6">
             <Input
               ref={searchRef}
