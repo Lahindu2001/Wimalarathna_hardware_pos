@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Printer, Home, Download } from 'lucide-react'
+import { Kbd } from '@/components/ui/kbd'
 
 interface ReceiptData {
   billNo: string
@@ -43,6 +44,19 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
     }
     setLoading(false)
   }, [resolvedParams.billNo])
+
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // ESC key to return to POS
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        router.push('/pos')
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [router])
 
   const handlePrint = () => {
     if (receiptRef.current) {
@@ -213,6 +227,10 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
         setTimeout(() => {
           printWindow.print()
           printWindow.close()
+          // Auto-navigate to POS after printing
+          setTimeout(() => {
+            router.push('/pos')
+          }, 500)
         }, 500)
       }
     }
@@ -292,7 +310,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </Button>
           <Button variant="outline" onClick={() => router.push('/pos')} className="gap-2">
             <Home size={18} />
-            Return to POS
+            <span className="flex items-center gap-2">
+              Return to POS <Kbd>ESC</Kbd>
+            </span>
           </Button>
         </div>
 
