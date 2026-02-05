@@ -77,7 +77,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               
               @page {
                 size: 80mm auto;
-                margin: 0mm 0mm 0mm 0mm;
+                margin: 0mm;
               }
               
               @media print {
@@ -91,6 +91,8 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   width: 80mm !important;
                   margin: 0 auto !important;
                   padding: 5mm !important;
+                }
+                .cut-line {
                   page-break-after: always;
                 }
               }
@@ -110,6 +112,10 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                 font-size: 13px;
                 line-height: 1.4;
                 background: white;
+              }
+              
+              .cut-line {
+                page-break-after: always;
               }
               
               .text-center {
@@ -215,16 +221,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           <body>
             <div class="receipt-container">
               ${receiptRef.current.innerHTML}
-              <div style="height: 15mm;"></div>
             </div>
-            <script>
-              // ESC/POS command for thermal printer auto-cut
-              window.onafterprint = function() {
-                // Send paper feed and cut commands
-                const cutCommand = '\x1B\x64\x05\x1D\x56\x41\x00';
-                document.write(cutCommand);
-              };
-            </script>
           </body>
           </html>
         `)
@@ -413,26 +410,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
             <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
             <p style={{ fontSize: '10px', fontStyle: 'italic', margin: '2px 0' }}>Provided by helacode.lk</p>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            <div style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
+            <div className="cut-line" style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
         </div>
         
