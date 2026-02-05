@@ -175,13 +175,13 @@ export default function POSPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       <AppHeader />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
-        {/* Products Section - Left */}
-        <div className="flex-1 bg-white lg:border-r order-2 lg:order-1">
+        {/* Left Side - Product Selection */}
+        <div className="flex-1 bg-white shadow-sm order-2 lg:order-1 overflow-auto">
           <POSProducts
             products={products}
             onAddToCart={handleAddToCart}
@@ -189,8 +189,8 @@ export default function POSPage() {
           />
         </div>
         
-        {/* Cart Section - Right */}
-        <div className="w-full lg:w-96 bg-gray-50 shadow-xl order-1 lg:order-2 max-h-[40vh] lg:max-h-none">
+        {/* Right Side - Receipt Style Cart (Compact) */}
+        <div className="w-full lg:w-[350px] bg-white shadow-2xl order-1 lg:order-2 flex flex-col">
           <POSCart
             items={cart}
             onUpdateQuantity={handleUpdateQuantity}

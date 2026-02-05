@@ -94,67 +94,92 @@ export function POSCart({
   }
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Cart Header */}
-      <div className="bg-blue-600 text-white p-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold">Cart</h2>
-          <span className="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
-            {itemCount} Items
-          </span>
+    <div className="h-full flex flex-col bg-white border-l-2 border-slate-200">
+      {/* Fixed Receipt Header */}
+      <div className="bg-slate-50 border-b-2 border-slate-300 px-4 py-3 flex-shrink-0">
+        <div className="text-center">
+          <h2 className="text-lg font-bold text-slate-800">BILL</h2>
+          <div className="flex items-center justify-center gap-3 text-xs text-slate-600 mt-1">
+            <span>{productCount} Products</span>
+            <span>•</span>
+            <span>{itemCount} Items</span>
+          </div>
         </div>
       </div>
 
       {items.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-gray-800 p-8">
-          <ShoppingCart size={64} className="mb-4 opacity-30" />
-          <p className="text-lg">Cart is empty</p>
-          <p className="text-sm">Add items to begin</p>
+        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-6">
+          <ShoppingCart size={48} className="mb-3 opacity-20" />
+          <p className="text-sm font-semibold text-slate-500">No items</p>
         </div>
       ) : (
         <>
-          {/* Total and Checkout - Moved to Top */}
-          <div className="bg-white border-b-4 border-gray-200 p-4 space-y-3">
-            <div className="flex justify-between items-center pb-3 border-b-2 border-gray-200">
-              <span className="text-gray-600 font-semibold text-lg">Total:</span>
-              <span className="text-3xl font-bold text-blue-600">
-                Rs. {total.toFixed(2)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2 text-sm text-gray-800">
-              <span>Products: {productCount}</span>
-              <span>|</span>
-              <span>Items: {itemCount}</span>
-              <span>|</span>
-              <span>Subtotal: Rs. {total.toFixed(2)}</span>
-            </div>
-            <Button
-              onClick={handleCheckout}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-6 text-xl font-bold shadow-lg transition-all active:scale-95"
-              disabled={items.length === 0 || loading}
-              tabIndex={2}
-            >
-              {loading ? 'Processing...' : (
-                <span className="flex items-center justify-center gap-3">
-                  Checkout <Kbd className="bg-white text-green-600 text-base">F9</Kbd>
-                </span>
-              )}
-            </Button>
-          </div>
-
-          {/* Cart Items */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white border-2 border-gray-200 rounded-lg p-3 hover:border-blue-300 transition-colors"
-              >
-                <div className="flex items-start justify-between gap-2 mb-2">
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-800 text-sm">
-                      {item.name}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1">
+          {/* Scrollable Receipt Items */}
+          <div className="flex-1 overflow-y-auto px-4 py-3">
+            <div className="space-y-2">
+              {items.map((item, index) => (
+                <div
+                  key={item.id}
+                  className="border-b border-dashed border-slate-300 pb-2 last:border-0"
+                >
+                  {/* Item Name Row */}
+                  <div className="flex items-start justify-between gap-2 mb-1">
+                    <div className="flex-1 flex items-center gap-1.5">
+                      <span className="text-xs font-bold text-slate-600">{index + 1}.</span>
+                      <p className="font-semibold text-slate-800 text-sm leading-tight">
+                        {item.name}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => onRemove(item.id)}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded"
+                      disabled={loading}
+                      title="Remove"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                  
+                  {/* Bill Line: Qty × Price = Total */}
+                  <div className="flex items-center justify-between text-xs pl-5">
+                    <div className="flex items-center gap-2">
+                      {/* Quantity with small controls */}
+                      <div className="flex items-center gap-0.5">
+                        <button
+                          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                          className="w-4 h-4 bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                          disabled={loading}
+                          tabIndex={-1}
+                        >
+                          −
+                        </button>
+                        <Input
+                          type="number"
+                          min="1"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const qty = parseInt(e.target.value)
+                            if (!isNaN(qty) && qty > 0) {
+                              onUpdateQuantity(item.id, qty)
+                            }
+                          }}
+                          onFocus={(e) => e.target.select()}
+                          className="w-8 text-center font-mono font-bold text-xs h-4 border border-slate-300 focus:border-blue-500 bg-white rounded px-0"
+                          tabIndex={4}
+                        />
+                        <button
+                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                          className="w-4 h-4 bg-slate-200 hover:bg-green-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                          disabled={loading}
+                          tabIndex={-1}
+                        >
+                          +
+                        </button>
+                      </div>
+                      
+                      <span className="text-slate-500">×</span>
+                      
+                      {/* Price (editable) */}
                       {editingPrice === item.id ? (
                         <Input
                           type="number"
@@ -170,71 +195,61 @@ export function POSCart({
                               setPriceValue('')
                             }
                           }}
-                          className="w-24 h-7 text-sm bg-white text-gray-900 border-2 border-blue-500"
+                          className="w-20 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
                           tabIndex={3}
                           autoFocus
                         />
                       ) : (
                         <button
                           onClick={() => handlePriceEdit(item)}
-                          className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
+                          className="text-blue-600 hover:underline font-mono"
                         >
-                          Rs. {Number(item.price).toFixed(2)}
+                          {Number(item.price).toFixed(2)}
                         </button>
                       )}
-                      <span className="text-gray-800 text-sm">×</span>
-                      <span className="text-sm font-semibold">{item.quantity}</span>
                     </div>
-                  </div>
-                  <div className="flex flex-col items-end gap-1">
-                    <p className="text-base font-bold text-gray-800">
-                      Rs. {(Number(item.price) * item.quantity).toFixed(2)}
-                    </p>
-                    <button
-                      onClick={() => onRemove(item.id)}
-                      className="text-red-600 hover:text-red-700 p-1"
-                      disabled={loading}
-                    >
-                      <X size={16} />
-                    </button>
+                    
+                    {/* Line Total */}
+                    <span className="font-mono font-bold text-slate-800">
+                      {(Number(item.price) * item.quantity).toFixed(2)}
+                    </span>
                   </div>
                 </div>
-                
-                {/* Quantity Controls */}
-                <div className="flex items-center gap-2 mt-2">
-                  <button
-                    onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white p-2 rounded font-bold transition-colors"
-                    disabled={loading}
-                    tabIndex={-1}
-                  >
-                    <Minus size={16} className="mx-auto" />
-                  </button>
-                  <Input
-                    type="number"
-                    min="1"
-                    value={item.quantity}
-                    onChange={(e) => {
-                      const qty = parseInt(e.target.value)
-                      if (!isNaN(qty) && qty > 0) {
-                        onUpdateQuantity(item.id, qty)
-                      }
-                    }}
-                    onFocus={(e) => e.target.select()}
-                    className="w-16 text-center font-bold text-lg h-10 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900"
-                    tabIndex={4}
-                  />
-                  <button
-                    onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                    className="flex-1 bg-green-600 hover:bg-green-700 text-white p-2 rounded font-bold transition-colors"
-                    disabled={loading}
-                    tabIndex={-1}
-                  >
-                    <Plus size={16} className="mx-auto" />
-                  </button>
-                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Fixed Receipt Footer - Total & Checkout */}
+          <div className="border-t-2 border-slate-300 bg-slate-50 px-4 py-3 flex-shrink-0">
+            {/* Receipt Total Lines */}
+            <div className="space-y-1 mb-3 font-mono text-sm">
+              <div className="flex justify-between text-slate-600">
+                <span>Subtotal:</span>
+                <span>Rs. {total.toFixed(2)}</span>
               </div>
-            ))}
+              <div className="flex justify-between text-slate-600">
+                <span>Tax:</span>
+                <span>Rs. 0.00</span>
+              </div>
+              <div className="border-t-2 border-dashed border-slate-400 pt-2 flex justify-between font-bold text-base text-slate-900">
+                <span>TOTAL:</span>
+                <span>Rs. {total.toFixed(2)}</span>
+              </div>
+            </div>
+            
+            {/* Compact Checkout Button */}
+            <Button
+              onClick={handleCheckout}
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-sm font-bold rounded shadow-md"
+              disabled={items.length === 0 || loading}
+              tabIndex={2}
+            >
+              {loading ? 'Processing...' : (
+                <span className="flex items-center justify-center gap-2">
+                  CHECKOUT <Kbd className="bg-white text-green-700 text-xs px-2 py-0.5">F9</Kbd>
+                </span>
+              )}
+            </Button>
           </div>
         </>
       )}

@@ -67,6 +67,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           <html>
           <head>
             <title>Receipt - ${receipt?.billNo}</title>
+            <meta charset="utf-8">
             <style>
               * {
                 margin: 0;
@@ -76,46 +77,39 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               
               @page {
                 size: 80mm auto;
-                margin: 0mm;
+                margin: 0mm 0mm 0mm 0mm;
               }
               
               @media print {
                 html, body {
                   width: 100%;
-                  height: 100%;
+                  height: auto;
                   margin: 0;
                   padding: 0;
-                  display: flex;
-                  justify-content: center;
-                  align-items: center;
                 }
                 .receipt-container {
                   width: 80mm !important;
-                  margin: auto !important;
-                  padding: 8mm !important;
+                  margin: 0 auto !important;
+                  padding: 5mm !important;
+                  page-break-after: always;
                 }
               }
               
               body {
-                font-family: 'Courier New', Courier, monospace;
+                font-family: Arial, sans-serif;
                 width: 100%;
-                height: 100vh;
                 margin: 0;
                 padding: 0;
                 background: white;
                 color: black;
-                display: flex;
-                justify-content: center;
-                align-items: center;
               }
               
               .receipt-container {
                 width: 80mm;
-                padding: 8mm;
-                font-size: 11px;
+                padding: 5mm;
+                font-size: 13px;
                 line-height: 1.4;
                 background: white;
-                border: 2px solid #000;
               }
               
               .text-center {
@@ -146,15 +140,18 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                 color: #111827;
               }
               
-              .pb-3 { padding-bottom: 12px; }
-              .mb-3 { margin-bottom: 12px; }
-              .pt-3 { padding-top: 12px; }
-              .mt-3 { margin-top: 12px; }
-              .mb-1 { margin-bottom: 4px; }
-              .mb-2 { margin-bottom: 8px; }
-              .pb-1 { padding-bottom: 4px; }
-              .pt-2 { padding-top: 8px; }
-              .p-2 { padding: 8px; }
+              .pb-3 { padding-bottom: 8px; }
+              .mb-3 { margin-bottom: 8px; }
+              .pt-3 { padding-top: 8px; }
+              .mt-3 { margin-top: 8px; }
+              .mb-1 { margin-bottom: 2px; }
+              .mb-2 { margin-bottom: 4px; }
+              .pb-1 { padding-bottom: 2px; }
+              .pb-2 { padding-bottom: 4px; }
+              .pt-1 { padding-top: 2px; }
+              .pt-2 { padding-top: 4px; }
+              .mt-2 { margin-top: 4px; }
+              .p-2 { padding: 4px; }
               
               .font-bold {
                 font-weight: bold;
@@ -175,26 +172,26 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               }
               
               .header-title {
-                font-size: 18px;
+                font-size: 16px;
                 font-weight: bold;
-                letter-spacing: 1px;
+                letter-spacing: 0.5px;
               }
               
               .text-xs {
-                font-size: 10px;
+                font-size: 12px;
               }
               
               .items-header {
-                font-size: 11px;
+                font-size: 13px;
                 font-weight: bold;
                 border-bottom: 2px solid #000;
-                padding-bottom: 4px;
-                margin-bottom: 8px;
+                padding-bottom: 2px;
+                margin-bottom: 4px;
               }
               
               .item-row {
-                font-size: 10px;
-                margin-bottom: 8px;
+                font-size: 12px;
+                margin-bottom: 4px;
               }
               
               .grand-total-box {
@@ -218,7 +215,16 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           <body>
             <div class="receipt-container">
               ${receiptRef.current.innerHTML}
+              <div style="height: 15mm;"></div>
             </div>
+            <script>
+              // ESC/POS command for thermal printer auto-cut
+              window.onafterprint = function() {
+                // Send paper feed and cut commands
+                const cutCommand = '\x1B\x64\x05\x1D\x56\x41\x00';
+                document.write(cutCommand);
+              };
+            </script>
           </body>
           </html>
         `)
@@ -226,12 +232,10 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
         printWindow.focus()
         setTimeout(() => {
           printWindow.print()
-          printWindow.close()
-          // Auto-navigate to POS after printing
           setTimeout(() => {
-            router.push('/pos')
-          }, 500)
-        }, 500)
+            printWindow.close()
+          }, 100)
+        }, 250)
       }
     }
   }
@@ -250,7 +254,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
   }
 
   const generateCSV = (data: ReceiptData): string => {
-    let csv = `Wimalarathne Hardware Receipt\n`
+    let csv = `Wimalrathna Hardware Receipt\n`
     csv += `Bill Number: ${data.billNo}\n`
     csv += `Customer: ${data.customerName}\n`
     csv += `Date: ${new Date(data.timestamp).toLocaleString('en-US', {
@@ -319,22 +323,22 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
         {/* Thermal Receipt Style - 80mm width */}
         <div
           ref={receiptRef}
-          className="bg-white text-gray-900 mx-auto font-mono leading-tight border-2 border-gray-300 shadow-lg"
-          style={{ width: '80mm', padding: '8mm', fontSize: '11px' }}
+          className="bg-white text-gray-900 mx-auto"
+          style={{ width: '80mm', padding: '5mm', fontSize: '13px', fontFamily: 'Arial, sans-serif', lineHeight: '1.4' }}
         >
           {/* Header */}
-          <div className="text-center border-b-2 border-gray-800 pb-3 mb-3">
-            <h1 className="font-bold uppercase" style={{ fontSize: '18px', letterSpacing: '1px' }}>
-              WIMALARATHNE HARDWARE
+          <div className="text-center border-b-2 border-gray-800 pb-2 mb-2">
+            <h1 className="font-bold uppercase" style={{ fontSize: '16px', letterSpacing: '0.5px' }}>
+              Wimalrathna Hardware
             </h1>
-            <p className="text-xs mt-1">213/1F, Medalanda, Dompe</p>
-            <p className="text-xs">Phone: 0778-683-489</p>
-            <p className="text-xs">Email: wimalarathne@hardware.lk</p>
+            <p style={{ fontSize: '12px', margin: '2px 0' }}>opposite hospital, Dompe</p>
+            <p style={{ fontSize: '12px', margin: '2px 0' }}>Phone: 0112409682</p>
+            <p style={{ fontSize: '12px', margin: '2px 0' }}>Email: wimalarathne@hardware.lk</p>
           </div>
 
           {/* Invoice Details */}
-          <div className="mb-3" style={{ fontSize: '11px' }}>
-            <div className="flex justify-between mb-1">
+          <div className="mb-2" style={{ fontSize: '12px' }}>
+            <div className="flex justify-between" style={{ marginBottom: '2px' }}>
               <span className="font-bold">Invoice# :</span>
               <span>{receipt.billNo}</span>
             </div>
@@ -355,16 +359,16 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Customer Details */}
-          <div className="border-t border-b border-dashed border-gray-700 py-2 mb-3" style={{ fontSize: '11px' }}>
-            <div className="mb-1">
-              <span className="font-bold">Customer Name : </span>
+          <div className="mb-2" style={{ fontSize: '12px' }}>
+            <div className="flex justify-between">
+              <span className="font-bold">Customer :</span>
               <span>{receipt.customerName}</span>
             </div>
           </div>
 
           {/* Items Table */}
-          <div className="mb-3">
-            <div className="border-b-2 border-gray-800 pb-1 mb-2 font-bold" style={{ fontSize: '11px' }}>
+          <div className="mb-2">
+            <div className="border-b-2 border-gray-800 pb-1 mb-1 font-bold" style={{ fontSize: '13px' }}>
               <div className="flex">
                 <span className="flex-1">Item</span>
                 <span style={{ width: '35px', textAlign: 'center' }}>Qty</span>
@@ -373,9 +377,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               </div>
             </div>
 
-            <div style={{ fontSize: '10px' }}>
+            <div style={{ fontSize: '12px' }}>
               {receipt.items.map((item, index) => (
-                <div key={item.id} className="mb-2">
+                <div key={item.id} style={{ marginBottom: '4px' }}>
                   <div className="flex items-start">
                     <span className="flex-1 font-semibold">{item.name}</span>
                     <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
@@ -392,42 +396,52 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           </div>
 
           {/* Summary Section */}
-          <div className="border-t-2 border-gray-800 pt-2 mb-3" style={{ fontSize: '11px' }}>
-            <div className="flex justify-between mb-1">
-              <span>Subtotal:</span>
-              <span className="font-bold">Rs. {Number(receipt.totalAmount).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between mb-1">
+          <div className="border-t-2 border-gray-800 pt-1 mb-2" style={{ fontSize: '13px' }}>
+            <div className="flex justify-between" style={{ marginBottom: '2px' }}>
               <span>Total Items:</span>
               <span className="font-bold">
                 {receipt.items.reduce((sum, item) => sum + item.quantity, 0)}
               </span>
             </div>
-          </div>
-
-          {/* Grand Total */}
-          <div className="border-2 border-gray-800 p-2 mb-3 text-center">
-            <div className="text-xs mb-1">GRAND TOTAL</div>
-            <div className="font-bold" style={{ fontSize: '16px' }}>
-              Rs. {Number(receipt.totalAmount).toFixed(2)}
+            <div className="flex justify-between">
+              <span className="font-bold">Total Amount:</span>
+              <span className="font-bold">Rs. {Number(receipt.totalAmount).toFixed(2)}</span>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="text-center border-t border-dashed border-gray-700 pt-3" style={{ fontSize: '10px' }}>
-            <p className="mb-2 font-semibold">Thank You For Your Purchase!</p>
-            <p className="mb-1">Please retain this receipt for warranty claims</p>
-            <p className="text-xs mt-2">
-              Printed: {new Date().toLocaleString('en-US', {
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: true
-              })}
-            </p>
+          <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
+            <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
+            <p style={{ fontSize: '10px', fontStyle: 'italic', margin: '2px 0' }}>Provided by helacode.lk</p>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <div style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
+        </div>
+        
+        {/* Empty lines after border */}
+        <div style={{ fontFamily: 'Arial, sans-serif' }}>
+          <br />
+          <br />
+          <br />
+          <br />
         </div>
       </div>
     </main>
