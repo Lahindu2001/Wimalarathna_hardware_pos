@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-import { ArrowLeft, Search, Calendar, ArrowUpDown } from 'lucide-react'
+import { AppHeader } from '@/components/app-header'
+import { Search, Calendar, ArrowUpDown } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 
 interface BillItem {
@@ -137,21 +138,13 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-3 md:px-6 py-3 md:py-4">
-          <div className="flex items-center gap-2 md:gap-4">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/pos')}
-              className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-              size="sm"
-            >
-              <ArrowLeft size={18} />
-              <span className="hidden md:inline">Back to POS</span>
-            </Button>
-            <h1 className="text-lg md:text-2xl font-bold flex-1">
-              Bill History
-            </h1>
+      <AppHeader />
+
+      {/* Page Title Bar */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="px-3 md:px-6 py-3">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-lg font-semibold text-gray-900">Bill History</h2>
           </div>
         </div>
       </div>

@@ -4,9 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { POSProducts } from '@/components/pos-products'
 import { POSCart } from '@/components/pos-cart'
-import { Button } from '@/components/ui/button'
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog'
-import { LogOut, BarChart3, Package, HelpCircle, Users } from 'lucide-react'
+import { AppHeader } from '@/components/app-header'
 import { KeyboardHelp } from '@/components/keyboard-help'
 
 interface Product {
@@ -26,7 +24,6 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false)
   const [showHelpDialog, setShowHelpDialog] = useState(false)
 
   useEffect(() => {
@@ -127,15 +124,6 @@ export default function POSPage() {
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/logout', { method: 'POST' })
-      router.push('/auth')
-    } catch (error) {
-      console.error('[v0] Logout error:', error)
-    }
-  }
-
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -154,11 +142,6 @@ export default function POSPage() {
         return
       }
 
-      // Ctrl+L for logout
-      if (e.ctrlKey && e.key === 'l') {
-        e.preventDefault()
-        setShowLogoutDialog(true)
-      }
       // Ctrl+H for history
       if (e.ctrlKey && e.key === 'h') {
         e.preventDefault()
@@ -193,70 +176,7 @@ export default function POSPage() {
 
   return (
     <main className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Top Bar */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-3 md:px-6 py-3 md:py-4">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 md:gap-0">
-            <div>
-              <h1 className="text-lg md:text-2xl font-bold">
-                Wimalarathne Hardware
-              </h1>
-              <p className="text-blue-100 text-xs md:text-sm">213/1F, Medalanda, Dompe | Phone: 0778-683-489</p>
-            </div>
-            <div className="flex flex-wrap gap-1 md:gap-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowHelpDialog(true)}
-                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-                size="sm"
-              >
-                <HelpCircle size={16} />
-                <span className="hidden md:inline">Help</span>
-                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+?</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/admin/users')}
-                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-                size="sm"
-              >
-                <Users size={16} />
-                <span className="hidden md:inline">Admin</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/inventory')}
-                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-                size="sm"
-              >
-                <Package size={16} />
-                <span className="hidden md:inline">Inventory</span>
-                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+I</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => router.push('/history')}
-                className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-                size="sm"
-              >
-                <BarChart3 size={16} />
-                <span className="hidden md:inline">History</span>
-                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+H</span>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setShowLogoutDialog(true)}
-                className="gap-1 md:gap-2 bg-red-600 text-white border-red-500 hover:bg-red-700"
-                size="sm"
-              >
-                <LogOut size={16} />
-                <span className="hidden md:inline">Logout</span>
-                <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">Ctrl+L</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AppHeader />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
@@ -284,22 +204,6 @@ export default function POSPage() {
 
       {/* Help Dialog */}
       <KeyboardHelp open={showHelpDialog} onOpenChange={setShowHelpDialog} />
-
-      {/* Logout Dialog */}
-      <AlertDialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <AlertDialogContent>
-          <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to logout? (Ctrl+L)
-          </AlertDialogDescription>
-          <div className="flex gap-3">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleLogout}>
-              Logout
-            </AlertDialogAction>
-          </div>
-        </AlertDialogContent>
-      </AlertDialog>
     </main>
   )
 }

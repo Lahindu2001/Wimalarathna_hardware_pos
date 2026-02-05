@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ArrowLeft, Plus, Edit2, Save, X } from 'lucide-react'
+import { AppHeader } from '@/components/app-header'
+import { Plus, Edit2, Save, X, Package } from 'lucide-react'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 
@@ -15,6 +16,12 @@ interface Product {
   name: string
   price: number
   stock: number
+}
+
+interface CategoryCount {
+  name: string
+  count: number
+  pattern: string
 }
 
 interface EditingProduct {
@@ -32,7 +39,43 @@ export default function InventoryPage() {
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+
+  // Category definitions
+  const categories: CategoryCount[] = [
+    { name: 'Hammers', pattern: 'Hammer%', count: 0 },
+    { name: 'Nails', pattern: 'Nails%', count: 0 },
+    { name: 'Screws', pattern: '%Screw%', count: 0 },
+    { name: 'Bolts', pattern: 'Bolt%', count: 0 },
+    { name: 'Wrenches', pattern: 'Wrench%', count: 0 },
+    { name: 'Pliers', pattern: 'Pliers%', count: 0 },
+    { name: 'Saws', pattern: 'Saw%', count: 0 },
+    { name: 'Screwdrivers', pattern: 'Screwdriver%', count: 0 },
+    { name: 'Drill Bits', pattern: 'Drill Bit%', count: 0 },
+    { name: 'Sandpaper', pattern: 'Sandpaper%', count: 0 },
+    { name: 'Adhesives', pattern: '%Glue%', count: 0 },
+    { name: 'Electrical', pattern: 'Wire Electrical%', count: 0 },
+    { name: 'Plumbing', pattern: 'PVC Pipe%', count: 0 },
+    { name: 'Cement', pattern: 'Cement%', count: 0 },
+    { name: 'Wood', pattern: 'Wood%', count: 0 },
+  ]
+
+  // Calculate category counts based on products
+  const categoryCounts = categories.map(cat => {
+    const pattern = cat.pattern.replace(/%/g, '')
+    const count = products.filter(p => {
+      if (cat.pattern.startsWith('%') && cat.pattern.endsWith('%')) {
+        return p.name.toLowerCase().includes(pattern.toLowerCase())
+      } else if (cat.pattern.startsWith('%')) {
+        return p.name.toLowerCase().endsWith(pattern.toLowerCase())
+      } else if (cat.pattern.endsWith('%')) {
+        return p.name.toLowerCase().startsWith(pattern.toLowerCase())
+      }
+      return p.name.toLowerCase() === pattern.toLowerCase()
+    }).length
+    return { ...cat, count }
+  }).filter(cat => cat.count > 0)
 
   useEffect(() => {
     fetchProducts()
@@ -140,11 +183,32 @@ export default function InventoryPage() {
     }
   }
 
-  const filteredProducts = products.filter(
-    (p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  const filteredProducts = products.filter((p) => {
+    // Search filter
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       p.id.toString().includes(searchQuery)
-  )
+    
+    // Category filter
+    if (!selectedCategory) return matchesSearch
+    
+    const category = categories.find(cat => cat.name === selectedCategory)
+    if (!category) return matchesSearch
+    
+    const pattern = category.pattern.replace(/%/g, '')
+    let matchesCategory = false
+    
+    if (category.pattern.startsWith('%') && category.pattern.endsWith('%')) {
+      matchesCategory = p.name.toLowerCase().includes(pattern.toLowerCase())
+    } else if (category.pattern.startsWith('%')) {
+      matchesCategory = p.name.toLowerCase().endsWith(pattern.toLowerCase())
+    } else if (category.pattern.endsWith('%')) {
+      matchesCategory = p.name.toLowerCase().startsWith(pattern.toLowerCase())
+    } else {
+      matchesCategory = p.name.toLowerCase() === pattern.toLowerCase()
+    }
+    
+    return matchesSearch && matchesCategory
+  })
 
   if (loading) {
     return (
@@ -159,29 +223,21 @@ export default function InventoryPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-3 md:px-6 py-3 md:py-4">
-          <div className="flex items-center gap-2 md:gap-4">
-            <Button
-              variant="outline"
-              onClick={() => router.push('/pos')}
-              className="gap-1 md:gap-2 bg-white/10 text-white border-white/20 hover:bg-white/20"
-              size="sm"
-            >
-              <ArrowLeft size={18} />
-              <span className="hidden md:inline">Back to POS</span>
-            </Button>
-            <h1 className="text-lg md:text-2xl font-bold flex-1">
-              Inventory Management
-            </h1>
+      <AppHeader />
+
+      {/* Add Product Button Bar */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="px-3 md:px-6 py-3">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Inventory Management</h2>
             <Button 
               onClick={() => setShowAddDialog(true)} 
-              className="gap-1 md:gap-2 bg-green-600 hover:bg-green-700 text-white border-0"
+              className="gap-2 bg-green-600 hover:bg-green-700 text-white"
               size="sm"
             >
               <Plus size={18} />
-              <span className="hidden md:inline">Add Product</span>
-              <span className="hidden lg:inline ml-1 px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">
+              <span>Add Product</span>
+              <span className="hidden lg:inline px-1.5 py-0.5 bg-white/20 rounded text-[10px] font-mono">
                 Shift++
               </span>
             </Button>
@@ -190,16 +246,76 @@ export default function InventoryPage() {
       </div>
 
       <div className="p-3 md:p-6 max-w-7xl mx-auto">
+        {/* Category Cards */}
+        {categoryCounts.length > 0 && (
+          <Card className="p-4 md:p-6 bg-white shadow-md mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">Products by Category</h2>
+              {selectedCategory && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedCategory(null)}
+                  className="gap-2"
+                >
+                  <X size={16} />
+                  Clear Filter
+                </Button>
+              )}
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+              {categoryCounts.map((category) => (
+                <button
+                  key={category.name}
+                  onClick={() => setSelectedCategory(
+                    selectedCategory === category.name ? null : category.name
+                  )}
+                  className={`p-4 rounded-lg text-left transition-all ${
+                    selectedCategory === category.name
+                      ? 'bg-blue-600 text-white shadow-lg scale-105'
+                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <p className={`text-sm font-medium ${
+                      selectedCategory === category.name ? 'text-white' : 'text-gray-600'
+                    }`}>
+                      {category.name}
+                    </p>
+                    <Package size={16} className={
+                      selectedCategory === category.name ? 'text-white' : 'text-gray-400'
+                    } />
+                  </div>
+                  <p className={`text-3xl font-bold ${
+                    selectedCategory === category.name ? 'text-white' : 'text-gray-900'
+                  }`}>
+                    {category.count}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
+
         <Card className="p-3 md:p-6 bg-white shadow-md">
-          <div className="mb-6">
-            <Input
-              ref={searchRef}
-              type="text"
-              placeholder="Search products... (Ctrl+/)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
-            />
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1">
+              <Input
+                ref={searchRef}
+                type="text"
+                placeholder="Search products... (Ctrl+/)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
+            {selectedCategory && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
+                <span className="text-sm font-medium text-blue-700">
+                  {selectedCategory}
+                </span>
+              </div>
+            )}
           </div>
 
           {filteredProducts.length === 0 ? (

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { AppHeader } from '@/components/app-header'
 import {
   Table,
   TableBody,
@@ -106,14 +107,19 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
-          <Button onClick={() => router.push('/pos')} variant="outline">
-            Back to POS
-          </Button>
+    <div className="min-h-screen bg-gray-50">
+      <AppHeader />
+
+      {/* Page Title Bar */}
+      <div className="bg-white border-b shadow-sm">
+        <div className="px-3 md:px-6 py-3">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-lg font-semibold text-gray-900">User Management</h2>
+          </div>
         </div>
+      </div>
+
+      <div className="p-6 max-w-7xl mx-auto">
 
         {error && (
           <Alert variant="destructive" className="mb-4">
