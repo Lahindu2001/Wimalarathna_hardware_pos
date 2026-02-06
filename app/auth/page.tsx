@@ -75,7 +75,7 @@ export default function AuthPage() {
             {isLogin ? 'Login' : 'Create Account'}
           </h1>
           <p className="text-sm md:text-base text-gray-600 mt-2 font-medium">
-            Wimalarathne Hardware
+            Wimalrathna Hardware
           </p>
         </div>
 

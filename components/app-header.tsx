@@ -29,9 +29,9 @@ export function AppHeader() {
           <div className="flex items-center justify-between">
             {/* Company Info */}
             <div>
-              <h1 className="text-lg md:text-xl font-bold">Wimalarathne Hardware</h1>
+              <h1 className="text-lg md:text-xl font-bold">Wimalrathna Hardware</h1>
               <p className="text-xs md:text-sm text-blue-100">
-                213/1F, Medalanda, Dompe | Phone: 0778-683-489
+                Hospital Opposite, Dompe | Phone: 0112409682
               </p>
             </div>
 

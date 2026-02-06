@@ -328,7 +328,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             <h1 className="font-bold uppercase" style={{ fontSize: '16px', letterSpacing: '0.5px' }}>
               Wimalrathna Hardware
             </h1>
-            <p style={{ fontSize: '12px', margin: '2px 0' }}>opposite hospital, Dompe</p>
+            <p style={{ fontSize: '12px', margin: '2px 0' }}>Hospital Opposite, Dompe</p>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Phone: 0112409682</p>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Email: wimalarathne@hardware.lk</p>
           </div>
