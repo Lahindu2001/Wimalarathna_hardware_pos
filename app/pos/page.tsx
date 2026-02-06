@@ -148,42 +148,11 @@ export default function POSPage() {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return
       }
-
-      // Ctrl+Q for POS (home)
-      if (e.ctrlKey && e.key === 'q') {
-        e.preventDefault()
-        router.push('/pos')
-      }
-      // Ctrl+U for admin
-      if (e.ctrlKey && e.key === 'u') {
-        e.preventDefault()
-        router.push('/admin/users')
-      }
-      // Ctrl+N for inventory
-      if (e.ctrlKey && e.key === 'n') {
-        e.preventDefault()
-        router.push('/inventory')
-      }
-      // Ctrl+B for history
-      if (e.ctrlKey && e.key === 'b') {
-        e.preventDefault()
-        router.push('/history')
-      }
-      // Ctrl+X for logout
-      if (e.ctrlKey && e.key === 'x') {
-        e.preventDefault()
-        router.push('/auth')
-      }
-      // Ctrl+/ for help
-      if (e.ctrlKey && e.key === '/') {
-        e.preventDefault()
-        setShowHelpDialog(true)
-      }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [router, cart])
+  }, [cart, checkoutLoading])
 
   if (loading) {
     return (
