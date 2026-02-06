@@ -2,14 +2,77 @@
 
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { HelpCircle, Users, Package, BarChart3, LogOut } from 'lucide-react'
-import { useState } from 'react'
+import { Home, HelpCircle, Users, Package, BarChart3, LogOut } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog'
+import { KeyboardHelp } from '@/components/keyboard-help'
 
 export function AppHeader() {
   const router = useRouter()
   const pathname = usePathname()
   const [showLogoutDialog, setShowLogoutDialog] = useState(false)
+  const [showHelpDialog, setShowHelpDialog] = useState(false)
+  const [currentDateTime, setCurrentDateTime] = useState('')
+
+  useEffect(() => {
+    const handleGlobalKeys = (e: KeyboardEvent) => {
+      // Alt+1 for POS
+      if (e.altKey && e.key === '1') {
+        e.preventDefault()
+        router.push('/pos')
+      }
+      // Alt+2 for Admin
+      if (e.altKey && e.key === '2') {
+        e.preventDefault()
+        router.push('/admin/users')
+      }
+      // Alt+3 for Inventory
+      if (e.altKey && e.key === '3') {
+        e.preventDefault()
+        router.push('/inventory')
+      }
+      // Alt+4 for History
+      if (e.altKey && e.key === '4') {
+        e.preventDefault()
+        router.push('/history')
+      }
+      // Alt+5 for Logout
+      if (e.altKey && e.key === '5') {
+        e.preventDefault()
+        setShowLogoutDialog(true)
+      }
+      // Alt+H for Help
+      if (e.altKey && e.key === 'h') {
+        e.preventDefault()
+        setShowHelpDialog(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalKeys)
+    return () => window.removeEventListener('keydown', handleGlobalKeys)
+  }, [router])
+
+  useEffect(() => {
+    const updateDateTime = () => {
+      const now = new Date()
+      const options: Intl.DateTimeFormatOptions = {
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      }
+      setCurrentDateTime(now.toLocaleString('en-US', options))
+    }
+
+    updateDateTime()
+    const interval = setInterval(updateDateTime, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
 
   const handleLogout = async () => {
     try {
@@ -33,6 +96,9 @@ export function AppHeader() {
               <p className="text-xs md:text-sm text-blue-100">
                 Hospital Opposite, Dompe | Phone: 0112409682
               </p>
+              <p className="text-xs md:text-sm text-blue-200 font-medium mt-1">
+                {currentDateTime}
+              </p>
             </div>
 
             {/* Navigation Buttons */}
@@ -45,10 +111,23 @@ export function AppHeader() {
                 }`}
                 size="sm"
               >
+                <Home size={18} />
+                <span className="hidden md:inline">Home</span>
+                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                  Alt+1
+                </span>
+              </Button>
+
+              <Button
+                variant="ghost"
+                onClick={() => setShowHelpDialog(true)}
+                className="gap-2 text-white hover:bg-white/20"
+                size="sm"
+              >
                 <HelpCircle size={18} />
                 <span className="hidden md:inline">Help</span>
                 <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Ctrl+?
+                  Alt+H
                 </span>
               </Button>
 
@@ -62,6 +141,9 @@ export function AppHeader() {
               >
                 <Users size={18} />
                 <span className="hidden md:inline">Admin</span>
+                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                  Alt+2
+                </span>
               </Button>
 
               <Button
@@ -75,7 +157,7 @@ export function AppHeader() {
                 <Package size={18} />
                 <span className="hidden md:inline">Inventory</span>
                 <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Ctrl+I
+                  Alt+3
                 </span>
               </Button>
 
@@ -90,7 +172,7 @@ export function AppHeader() {
                 <BarChart3 size={18} />
                 <span className="hidden md:inline">History</span>
                 <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Ctrl+H
+                  Alt+4
                 </span>
               </Button>
 
@@ -103,7 +185,7 @@ export function AppHeader() {
                 <LogOut size={18} />
                 <span className="hidden md:inline">Logout</span>
                 <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Ctrl+L
+                  Alt+5
                 </span>
               </Button>
             </div>
@@ -133,6 +215,9 @@ export function AppHeader() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Help Dialog - Global */}
+      <KeyboardHelp open={showHelpDialog} onOpenChange={setShowHelpDialog} />
     </>
   )
 }

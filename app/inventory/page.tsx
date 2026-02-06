@@ -41,6 +41,12 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
+  const resultsRef = useRef<HTMLDivElement>(null)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const priceRef = useRef<HTMLInputElement>(null)
+  const stockRef = useRef<HTMLInputElement>(null)
+  const addButtonRef = useRef<HTMLButtonElement>(null)
+  const cancelButtonRef = useRef<HTMLButtonElement>(null)
 
   // Category definitions
   const categories: CategoryCount[] = [
@@ -88,16 +94,46 @@ export default function InventoryPage() {
         e.preventDefault()
         setShowAddDialog(true)
       }
-      // Focus search on Ctrl+/
-      if (e.ctrlKey && e.key === '/') {
+      // Focus search on Ctrl+/ or Shift+/
+      if ((e.ctrlKey && e.key === '/') || (e.shiftKey && e.key === '?')) {
         e.preventDefault()
         searchRef.current?.focus()
+        searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       }
     }
 
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [])
+
+  // Auto-focus product name when dialog opens
+  useEffect(() => {
+    if (showAddDialog) {
+      setTimeout(() => {
+        nameRef.current?.focus()
+        nameRef.current?.select()
+      }, 100)
+    }
+    
+    // ESC key to close dialog
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showAddDialog) {
+        setShowAddDialog(false)
+      }
+    }
+    
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [showAddDialog])
+
+  // Auto-scroll to results when searching
+  useEffect(() => {
+    if (searchQuery && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [searchQuery])
 
   const fetchProducts = async () => {
     try {
@@ -297,13 +333,13 @@ export default function InventoryPage() {
           </Card>
         )}
 
-        <Card className="p-3 md:p-6 bg-white shadow-md">
+        <Card className="p-3 md:p-6 bg-white shadow-md" ref={resultsRef}>
           <div className="flex items-center gap-3 mb-6">
             <div className="flex-1">
               <Input
                 ref={searchRef}
                 type="text"
-                placeholder="Search products... (Ctrl+/)"
+                placeholder="Search products... (Ctrl+/ or Shift+/)"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
@@ -460,11 +496,25 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <Label htmlFor="name" className="text-gray-900 font-semibold">Product Name</Label>
               <Input
+                ref={nameRef}
                 id="name"
                 value={newProduct.name}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, name: e.target.value })
                 }
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    priceRef.current?.focus()
+                    priceRef.current?.select()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    priceRef.current?.focus()
+                    priceRef.current?.select()
+                  }
+                }}
                 placeholder="e.g., Hammer 500g"
                 className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
@@ -473,6 +523,7 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <Label htmlFor="price" className="text-gray-900 font-semibold">Price (Rs.)</Label>
               <Input
+                ref={priceRef}
                 id="price"
                 type="number"
                 step="0.01"
@@ -480,6 +531,24 @@ export default function InventoryPage() {
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, price: e.target.value })
                 }
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    stockRef.current?.focus()
+                    stockRef.current?.select()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    nameRef.current?.focus()
+                    nameRef.current?.select()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    stockRef.current?.focus()
+                    stockRef.current?.select()
+                  }
+                }}
                 placeholder="450.00"
                 className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
@@ -488,12 +557,29 @@ export default function InventoryPage() {
             <div className="space-y-2">
               <Label htmlFor="stock" className="text-gray-900 font-semibold">Stock Quantity</Label>
               <Input
+                ref={stockRef}
                 id="stock"
                 type="number"
                 value={newProduct.stock}
                 onChange={(e) =>
                   setNewProduct({ ...newProduct, stock: e.target.value })
                 }
+                onFocus={(e) => e.target.select()}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    addButtonRef.current?.focus()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    priceRef.current?.focus()
+                    priceRef.current?.select()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    addButtonRef.current?.focus()
+                  }
+                }}
                 placeholder="25"
                 className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
@@ -501,14 +587,33 @@ export default function InventoryPage() {
 
             <div className="flex gap-3 pt-4">
               <Button
+                ref={cancelButtonRef}
                 variant="outline"
                 onClick={() => setShowAddDialog(false)}
+                onKeyDown={(e) => {
+                  if (e.shiftKey && e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    addButtonRef.current?.focus()
+                  }
+                }}
                 className="flex-1 h-11 border-2 border-gray-300 hover:bg-gray-100 text-gray-900 font-medium"
               >
                 Cancel
               </Button>
               <Button
+                ref={addButtonRef}
                 onClick={handleAddProduct}
+                onKeyDown={(e) => {
+                  if (e.shiftKey && e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    stockRef.current?.focus()
+                    stockRef.current?.select()
+                  }
+                  if (e.shiftKey && e.key === 'ArrowDown') {
+                    e.preventDefault()
+                    cancelButtonRef.current?.focus()
+                  }
+                }}
                 className="flex-1 h-11 bg-green-600 hover:bg-green-700 text-white font-semibold"
               >
                 Add Product

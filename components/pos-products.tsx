@@ -95,7 +95,10 @@ export function POSProducts({
     setQuantity('1')
     setShowResults(false)
     setSearchQuery('')
-    setTimeout(() => qtyRef.current?.focus(), 50)
+    setTimeout(() => {
+      qtyRef.current?.focus()
+      qtyRef.current?.select()
+    }, 50)
   }
 
   const handleAddToCart = () => {
@@ -124,10 +127,22 @@ export function POSProducts({
       e.preventDefault()
       handleAddToCart()
     }
+    // Shift + Up Arrow to go back to quantity
+    if (e.shiftKey && e.key === 'ArrowUp') {
+      e.preventDefault()
+      qtyRef.current?.focus()
+      qtyRef.current?.select()
+    }
   }
 
   const handleKeyDownOnQty = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      priceRef.current?.focus()
+      priceRef.current?.select()
+    }
+    // Shift + Down Arrow to go to price
+    if (e.shiftKey && e.key === 'ArrowDown') {
       e.preventDefault()
       priceRef.current?.focus()
       priceRef.current?.select()
@@ -262,6 +277,7 @@ export function POSProducts({
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
                 onKeyDown={handleKeyDownOnQty}
+                onFocus={(e) => e.target.select()}
                 className="h-14 text-lg font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-100 shadow-sm"
                 tabIndex={2}
               />
@@ -302,7 +318,9 @@ export function POSProducts({
             <h3 className="text-xs font-bold text-slate-600 uppercase mb-2">Keyboard Shortcuts</h3>
             <div className="space-y-1 text-xs text-slate-600">
               <p><kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">F9</kbd> Checkout</p>
+              <p><kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">Esc</kbd> Clear cart</p>
               <p><kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">Tab</kbd> Next field</p>
+              <p><kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">Shift+↑↓</kbd> Qty/Price</p>
               <p><kbd className="px-2 py-0.5 bg-white border border-slate-300 rounded text-xs font-mono">↑↓</kbd> Navigate results</p>
             </div>
           </div>

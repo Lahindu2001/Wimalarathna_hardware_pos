@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import { POSProducts } from '@/components/pos-products'
 import { POSCart } from '@/components/pos-cart'
 import { AppHeader } from '@/components/app-header'
-import { KeyboardHelp } from '@/components/keyboard-help'
 
 interface Product {
   id: number
@@ -24,7 +23,6 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
-  const [showHelpDialog, setShowHelpDialog] = useState(false)
 
   useEffect(() => {
     fetchProducts()
@@ -137,23 +135,47 @@ export default function POSPage() {
         return
       }
 
+      // ESC to clear cart
+      if (e.key === 'Escape' && cart.length > 0) {
+        e.preventDefault()
+        if (confirm('Clear all items from cart?')) {
+          setCart([])
+        }
+        return
+      }
+
       // Prevent other shortcuts when typing in input fields
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
         return
       }
 
-      // Ctrl+H for history
-      if (e.ctrlKey && e.key === 'h') {
+      // Ctrl+Q for POS (home)
+      if (e.ctrlKey && e.key === 'q') {
         e.preventDefault()
-        router.push('/history')
+        router.push('/pos')
       }
-      // Ctrl+I for inventory
-      if (e.ctrlKey && e.key === 'i') {
+      // Ctrl+U for admin
+      if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault()
+        router.push('/admin/users')
+      }
+      // Ctrl+N for inventory
+      if (e.ctrlKey && e.key === 'n') {
         e.preventDefault()
         router.push('/inventory')
       }
-      // Ctrl+? for help
-      if (e.ctrlKey && e.shiftKey && e.key === '?') {
+      // Ctrl+B for history
+      if (e.ctrlKey && e.key === 'b') {
+        e.preventDefault()
+        router.push('/history')
+      }
+      // Ctrl+X for logout
+      if (e.ctrlKey && e.key === 'x') {
+        e.preventDefault()
+        router.push('/auth')
+      }
+      // Ctrl+/ for help
+      if (e.ctrlKey && e.key === '/') {
         e.preventDefault()
         setShowHelpDialog(true)
       }
@@ -201,9 +223,6 @@ export default function POSPage() {
           />
         </div>
       </div>
-
-      {/* Help Dialog */}
-      <KeyboardHelp open={showHelpDialog} onOpenChange={setShowHelpDialog} />
     </main>
   )
 }
