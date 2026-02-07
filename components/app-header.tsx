@@ -6,6 +6,7 @@ import { Home, HelpCircle, Users, Package, BarChart3, LogOut } from 'lucide-reac
 import { useState, useEffect } from 'react'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { KeyboardHelp } from '@/components/keyboard-help'
+import { useRef, useCallback } from 'react'
 
 export function AppHeader() {
   const router = useRouter()
@@ -202,22 +203,55 @@ export function AppHeader() {
           <AlertDialogDescription className="text-gray-700">
             Are you sure you want to logout? You will need to login again to access the system.
           </AlertDialogDescription>
-          <div className="flex gap-3 mt-4">
-            <AlertDialogCancel className="flex-1 border-2 border-gray-300 hover:bg-gray-100 text-gray-900">
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleLogout}
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
-            >
-              Logout
-            </AlertDialogAction>
-          </div>
+          <LogoutDialogActions handleLogout={handleLogout} setShowLogoutDialog={setShowLogoutDialog} />
         </AlertDialogContent>
       </AlertDialog>
 
       {/* Help Dialog - Global */}
       <KeyboardHelp open={showHelpDialog} onOpenChange={setShowHelpDialog} />
     </>
+  )
+}
+
+// Custom actions for logout dialog with keyboard navigation
+function LogoutDialogActions({ handleLogout, setShowLogoutDialog }: { handleLogout: () => void, setShowLogoutDialog: (v: boolean) => void }) {
+  const cancelRef = useRef<HTMLButtonElement>(null)
+  const logoutRef = useRef<HTMLButtonElement>(null)
+  // Focus Logout by default
+  useEffect(() => {
+    logoutRef.current?.focus()
+  }, [])
+  // Keyboard navigation
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Tab') {
+      e.preventDefault()
+      if (document.activeElement === logoutRef.current) {
+        cancelRef.current?.focus()
+      } else {
+        logoutRef.current?.focus()
+      }
+    }
+    if (e.key === 'Escape') {
+      setShowLogoutDialog(false)
+    }
+  }, [setShowLogoutDialog])
+  return (
+    <div className="flex gap-3 mt-4">
+      <AlertDialogCancel
+        ref={cancelRef}
+        className="flex-1 border-2 border-gray-300 hover:bg-gray-100 text-gray-900"
+        onKeyDown={handleKeyDown}
+      >
+        Cancel
+      </AlertDialogCancel>
+      <AlertDialogAction
+        ref={logoutRef}
+        onClick={handleLogout}
+        className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+        onKeyDown={handleKeyDown}
+      >
+        Logout
+      </AlertDialogAction>
+    </div>
   )
 }
