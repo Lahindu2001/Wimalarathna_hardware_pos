@@ -65,13 +65,13 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const itemTotal = product.price * item.quantity
+      const itemTotal = item.price * item.quantity
       totalAmount += itemTotal
 
       billItems.push({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: item.price, // use cart price
         quantity: item.quantity,
         total: itemTotal,
       })
