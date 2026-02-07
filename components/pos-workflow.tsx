@@ -521,7 +521,9 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
               <Input
                 value={
                   amountPaid && parseFloat(amountPaid) > 0
-                    ? `Rs. ${formatCurrency(Math.abs(parseFloat(amountPaid) - total))}`
+                    ? parseFloat(amountPaid) >= total
+                      ? `Rs. ${formatCurrency(Math.abs(parseFloat(amountPaid) - total))}`
+                      : `Rs. -${formatCurrency(Math.abs(parseFloat(amountPaid) - total))}`
                     : 'Rs. 0.00'
                 }
                 readOnly
@@ -535,7 +537,7 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
               />
               {amountPaid && parseFloat(amountPaid) > 0 && parseFloat(amountPaid) < total && (
                 <p className="text-sm text-red-600 font-medium">
-                  Short by Rs. {formatCurrency(total - parseFloat(amountPaid))}
+                  Short by Rs. -{formatCurrency(total - parseFloat(amountPaid))}
                 </p>
               )}
             </div>

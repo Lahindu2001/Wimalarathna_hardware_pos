@@ -430,7 +430,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                       <div className="flex justify-between">
                         <span>{change >= 0 ? 'Change:' : 'Shortage:'}</span>
                         <span className={`font-bold ${change >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                          Rs. {formatCurrency(Math.abs(change))}
+                          {change >= 0
+                            ? `Rs. ${formatCurrency(Math.abs(change))}`
+                            : `-Rs. ${formatCurrency(Math.abs(change))}`}
                         </span>
                       </div>
                     );
