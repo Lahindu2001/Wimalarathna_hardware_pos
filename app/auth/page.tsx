@@ -104,14 +104,16 @@ export default function AuthPage() {
 
           {/* Standard Alerts */}
           {success && (
-            <Alert className="mb-3 sm:mb-4 bg-green-50 text-green-900 border-green-200">
-              <span className="font-bold">Success:</span> {success}
-            </Alert>
+            <div className="mb-3 sm:mb-4 flex items-center gap-2 rounded-md bg-green-50 border border-green-200 px-3 py-2 text-green-900 shadow-sm animate-fade-in">
+              <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/><path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4"/></svg>
+              <span className="font-semibold">{success}</span>
+            </div>
           )}
           {error && (
-            <Alert variant="destructive" className="mb-3 sm:mb-4">
-              <span className="font-bold">Error:</span> {error}
-            </Alert>
+            <div className="mb-3 sm:mb-4 flex items-center gap-2 rounded-md bg-red-50 border border-red-200 px-3 py-2 text-red-800 shadow-sm animate-fade-in">
+              <svg className="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01"/></svg>
+              <span className="font-semibold">{error}</span>
+            </div>
           )}
           {!success && !error && (
             <Alert className="mb-3 sm:mb-4 bg-blue-50 text-blue-900 border-blue-200 flex items-center gap-2 sm:gap-3">
