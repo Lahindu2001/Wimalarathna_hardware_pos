@@ -423,14 +423,20 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   <span>Amount Paid:</span>
                   <span className="font-bold">Rs. {formatCurrency(Number(receipt.amountPaid))}</span>
                 </div>
-                {receipt.changeReturned !== undefined && receipt.changeReturned !== 0 && (
-                  <div className="flex justify-between">
-                    <span>{receipt.changeReturned >= 0 ? 'Change:' : 'Shortage:'}</span>
-                    <span className={`font-bold ${receipt.changeReturned >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                      Rs. {formatCurrency(Math.abs(Number(receipt.changeReturned)))}
-                    </span>
-                  </div>
-                )}
+                {(() => {
+                  const change = Number(receipt.amountPaid) - Number(receipt.totalAmount);
+                  if (!isNaN(change) && change !== 0) {
+                    return (
+                      <div className="flex justify-between">
+                        <span>{change >= 0 ? 'Change:' : 'Shortage:'}</span>
+                        <span className={`font-bold ${change >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                          Rs. {formatCurrency(Math.abs(change))}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </>
             )}
           </div>
