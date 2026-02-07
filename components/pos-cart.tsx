@@ -155,12 +155,12 @@ export function POSCart({
   }, [items, onUpdateQuantity, onRemove, handleCheckout])
 
   return (
-    <div className="h-full flex flex-col bg-white border-l-2 border-slate-200">
+    <div className="h-full flex flex-col bg-white border-l-0 lg:border-l-2 border-slate-200">
       {/* Fixed Receipt Header */}
-      <div className="bg-slate-50 border-b-2 border-slate-300 px-4 py-3 flex-shrink-0">
+      <div className="bg-slate-50 border-b-2 border-slate-300 px-2 sm:px-3 md:px-4 py-2 sm:py-3 flex-shrink-0">
         <div className="text-center">
-          <h2 className="text-lg font-bold text-slate-800">BILL</h2>
-          <div className="flex items-center justify-center gap-3 text-xs text-slate-600 mt-1">
+          <h2 className="text-base sm:text-lg font-bold text-slate-800">BILL</h2>
+          <div className="flex items-center justify-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-600 mt-1">
             <span>{productCount} Products</span>
             <span>•</span>
             <span>{itemCount} Items</span>
@@ -169,35 +169,35 @@ export function POSCart({
       </div>
 
       {items.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-6">
-          <ShoppingCart size={48} className="mb-3 opacity-20" />
-          <p className="text-sm font-semibold text-slate-500">No items</p>
+        <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-4 sm:p-6">
+          <ShoppingCart size={36} className="mb-2 sm:mb-3 opacity-20 sm:w-12 sm:h-12" />
+          <p className="text-xs sm:text-sm font-semibold text-slate-500">No items</p>
         </div>
       ) : (
         <>
           {/* Scrollable Receipt Items */}
-          <div className="flex-1 overflow-y-auto px-4 py-3">
-            <div className="space-y-2">
+          <div className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3">
+            <div className="space-y-1.5 sm:space-y-2">
               {items.map((item, index) => (
                 <div
                   key={item.id}
-                  className="border-b border-dashed border-slate-300 pb-2 last:border-0"
+                  className="border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0"
                 >
                   {/* Item Name Row */}
-                  <div className="flex items-start justify-between gap-2 mb-1">
-                    <div className="flex-1 flex items-center gap-1.5">
-                      <span className="text-xs font-bold text-slate-600">{index + 1}.</span>
-                      <p className="font-semibold text-slate-800 text-sm leading-tight">
+                  <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+                    <div className="flex-1 flex items-center gap-1 sm:gap-1.5">
+                      <span className="text-[10px] sm:text-xs font-bold text-slate-600">{index + 1}.</span>
+                      <p className="font-semibold text-slate-800 text-xs sm:text-sm leading-tight">
                         {item.name}
                       </p>
                     </div>
                     <button
                       onClick={() => onRemove(item.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded flex-shrink-0"
                       disabled={loading}
                       title="Remove"
                     >
-                      <X size={14} />
+                      <X size={12} className="sm:w-[14px] sm:h-[14px]" />
                     </button>
                   </div>
                   
@@ -281,9 +281,9 @@ export function POSCart({
           </div>
 
           {/* Fixed Receipt Footer - Total & Checkout */}
-          <div className="border-t-2 border-slate-300 bg-slate-50 px-4 py-3 flex-shrink-0">
+          <div className="border-t-2 border-slate-300 bg-slate-50 px-2 sm:px-3 md:px-4 py-2 sm:py-3 flex-shrink-0">
             {/* Receipt Total Lines */}
-            <div className="space-y-1 mb-3 font-mono text-sm">
+            <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3 font-mono text-[11px] sm:text-xs md:text-sm">
               <div className="flex justify-between text-slate-600">
                 <span>Subtotal:</span>
                 <span>Rs. {formatCurrency(total)}</span>
@@ -292,7 +292,7 @@ export function POSCart({
                 <span>Tax:</span>
                 <span>Rs. 0.00</span>
               </div>
-              <div className="border-t-2 border-dashed border-slate-400 pt-2 flex justify-between font-bold text-base text-slate-900">
+              <div className="border-t-2 border-dashed border-slate-400 pt-1.5 sm:pt-2 flex justify-between font-bold text-sm sm:text-base text-slate-900">
                 <span>TOTAL:</span>
                 <span>Rs. {formatCurrency(total)}</span>
               </div>
@@ -301,13 +301,13 @@ export function POSCart({
             {/* Compact Checkout Button */}
             <Button
               onClick={handleCheckout}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-3 text-sm font-bold rounded shadow-md"
+              className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded shadow-md"
               disabled={items.length === 0 || loading}
               tabIndex={2}
             >
               {loading ? 'Processing...' : (
-                <span className="flex items-center justify-center gap-2">
-                  CHECKOUT <Kbd className="bg-white text-green-700 text-xs px-2 py-0.5">F9</Kbd>
+                <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                  CHECKOUT <Kbd className="bg-white text-green-700 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">F9</Kbd>
                 </span>
               )}
             </Button>
@@ -317,19 +317,19 @@ export function POSCart({
 
       {/* Checkout Payment Dialog */}
       <Dialog open={showCheckoutDialog} onOpenChange={setShowCheckoutDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md w-[95vw] max-w-[450px]">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center">
+            <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-center">
               Checkout Payment
             </DialogTitle>
-            <DialogDescription className="text-center text-lg text-gray-600 mt-2">
+            <DialogDescription className="text-center text-sm sm:text-base md:text-lg text-gray-600 mt-1 sm:mt-2">
               Total: <span className="font-bold text-blue-600">Rs. {formatCurrency(total)}</span>
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 py-4">
+          <div className="space-y-4 sm:space-y-6 py-3 sm:py-4">
             {/* Customer Name */}
-            <div className="space-y-2">
-              <Label htmlFor="customerName" className="text-base font-medium">Customer Name <span className="text-gray-500 text-sm">(Optional - defaults to Walk-in)</span></Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="customerName" className="text-sm sm:text-base font-medium">Customer Name <span className="text-gray-500 text-xs sm:text-sm">(Optional - defaults to Walk-in)</span></Label>
               <Input
                 id="customerName"
                 value={customerName}
@@ -341,14 +341,14 @@ export function POSCart({
                   }
                 }}
                 placeholder="Enter customer name (optional)"
-                className="h-12 text-lg"
+                className="h-10 sm:h-12 text-sm sm:text-base md:text-lg"
                 autoFocus
               />
             </div>
 
             {/* Amount Paid */}
-            <div className="space-y-2">
-              <Label htmlFor="amountPaid" className="text-base font-medium">Amount Paid</Label>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="amountPaid" className="text-sm sm:text-base font-medium">Amount Paid</Label>
               <Input
                 id="amountPaid"
                 type="number"
@@ -362,12 +362,12 @@ export function POSCart({
                   }
                 }}
                 placeholder="0.00"
-                className="h-12 text-lg"
+                className="h-10 sm:h-12 text-sm sm:text-base md:text-lg"
               />
             </div>
 
             {/* Amount Due */}
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <Label className="text-base font-medium">
                 {amountPaid && parseFloat(amountPaid) > 0
                   ? parseFloat(amountPaid) >= total

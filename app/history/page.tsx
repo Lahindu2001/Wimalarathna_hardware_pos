@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -285,24 +285,25 @@ export default function HistoryPage() {
           </div>
 
           {filteredBills.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-800">
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-sm sm:text-base text-gray-800">
                 {bills.length === 0
                   ? 'No bills found. Start making sales!'
                   : 'No matching bills found'}
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-3 md:mx-0">
+              <div className="min-w-[800px]">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-100 border-b-2 border-gray-300">
-                    <TableHead className="text-gray-800 font-bold">Bill No</TableHead>
-                    <TableHead className="text-gray-800 font-bold">Customer</TableHead>
-                    <TableHead className="text-gray-800 font-bold">Date/Time</TableHead>
-                    <TableHead className="text-right text-gray-800 font-bold">Items</TableHead>
-                    <TableHead className="text-right text-gray-800 font-bold">Total</TableHead>
-                    <TableHead className="text-center text-gray-800 font-bold">Actions</TableHead>
+                    <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Bill No</TableHead>
+                    <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Customer</TableHead>
+                    <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Date/Time</TableHead>
+                    <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Items</TableHead>
+                    <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Total</TableHead>
+                    <TableHead className="text-center text-gray-800 font-bold text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -313,9 +314,8 @@ export default function HistoryPage() {
                     const isExpanded = expandedBillId === bill.id
                     
                     return (
-                      <>
+                      <React.Fragment key={bill.id}>
                         <TableRow
-                          key={bill.id}
                           className="hover:bg-blue-50 border-b border-gray-200 transition-colors"
                         >
                           <TableCell className="font-mono font-bold text-blue-600">
@@ -342,12 +342,12 @@ export default function HistoryPage() {
                             Rs. {formatCurrency(Number(bill.total_amount))}
                           </TableCell>
                           <TableCell className="text-center">
-                            <div className="flex gap-2 justify-center">
+                            <div className="flex gap-1 sm:gap-2 justify-center flex-wrap">
                               <Button
                                 size="sm"
                                 variant="outline"
                                 onClick={() => setExpandedBillId(isExpanded ? null : bill.id)}
-                                className="bg-blue-600 text-white hover:bg-blue-700"
+                                className="bg-blue-600 text-white hover:bg-blue-700 text-xs sm:text-sm px-2 sm:px-3"
                               >
                                 {isExpanded ? 'Hide Details' : 'Show Details'}
                               </Button>
@@ -369,7 +369,7 @@ export default function HistoryPage() {
                                   )
                                   router.push(`/receipt/${bill.bill_no}`)
                                 }}
-                                className="bg-green-600 text-white hover:bg-green-700"
+                                className="bg-green-600 text-white hover:bg-green-700 text-xs sm:text-sm px-2 sm:px-3"
                               >
                                 View Receipt
                               </Button>
@@ -435,11 +435,12 @@ export default function HistoryPage() {
                             </TableCell>
                           </TableRow>
                         )}
-                      </>
+                      </React.Fragment>
                     )
                   })}
                 </TableBody>
               </Table>
+              </div>
             </div>
           )}
         </Card>

@@ -355,25 +355,26 @@ export default function InventoryPage() {
           </div>
 
           {filteredProducts.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-800">No products found</p>
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-sm sm:text-base text-gray-800">No products found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-3 md:mx-0">
+              <div className="min-w-[640px]">
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gray-100 border-b-2 border-gray-300">
-                    <TableHead className="text-gray-800 font-bold">Product ID</TableHead>
-                    <TableHead className="text-gray-800 font-bold">Product Name</TableHead>
-                    <TableHead className="text-right text-gray-800 font-bold">Price (Rs.)</TableHead>
-                    <TableHead className="text-right text-gray-800 font-bold">Stock</TableHead>
-                    <TableHead className="text-center text-gray-800 font-bold">Actions</TableHead>
+                    <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Product ID</TableHead>
+                    <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Product Name</TableHead>
+                    <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Price (Rs.)</TableHead>
+                    <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Stock</TableHead>
+                    <TableHead className="text-center text-gray-800 font-bold text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredProducts.map((product) => (
                     <TableRow key={product.id} className="border-b border-gray-200 hover:bg-gray-50">
-                      <TableCell className="font-mono text-sm text-gray-800 font-semibold">
+                      <TableCell className="font-mono text-xs sm:text-sm text-gray-800 font-semibold">
                         {product.id}
                       </TableCell>
                       <TableCell className="text-gray-800">
@@ -477,6 +478,7 @@ export default function InventoryPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             </div>
           )}
         </Card>

@@ -88,32 +88,32 @@ export function AppHeader() {
   return (
     <>
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-4 md:px-6 py-3 md:py-4">
-          <div className="flex items-center justify-between">
+        <div className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
+          <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Company Info */}
-            <div>
-              <h1 className="text-lg md:text-xl font-bold">Wimalrathna Hardware</h1>
-              <p className="text-xs md:text-sm text-blue-100">
+            <div className="min-w-0 flex-shrink">
+              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">Wimalrathna Hardware</h1>
+              <p className="text-[10px] sm:text-xs md:text-sm text-blue-100 hidden sm:block">
                 Hospital Opposite, Dompe | Phone: 0112409682
               </p>
-              <p className="text-xs md:text-sm text-blue-200 font-medium mt-1">
+              <p className="text-[10px] sm:text-xs md:text-sm text-blue-200 font-medium mt-0.5 sm:mt-1">
                 {currentDateTime}
               </p>
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
               <Button
                 variant="ghost"
                 onClick={() => router.push('/pos')}
-                className={`gap-2 text-white hover:bg-white/20 ${
+                className={`gap-1 sm:gap-2 text-white hover:bg-white/20 px-2 sm:px-3 ${
                   isActive('/pos') ? 'bg-white/20' : ''
                 }`}
                 size="sm"
               >
-                <Home size={18} />
-                <span className="hidden md:inline">Home</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <Home size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">Home</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+1
                 </span>
               </Button>
@@ -121,12 +121,12 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 onClick={() => setShowHelpDialog(true)}
-                className="gap-2 text-white hover:bg-white/20"
+                className="gap-1 sm:gap-2 text-white hover:bg-white/20 px-2 sm:px-3"
                 size="sm"
               >
-                <HelpCircle size={18} />
-                <span className="hidden md:inline">Help</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <HelpCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">Help</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+H
                 </span>
               </Button>
@@ -134,14 +134,14 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 onClick={() => router.push('/admin/users')}
-                className={`gap-2 text-white hover:bg-white/20 ${
+                className={`gap-1 sm:gap-2 text-white hover:bg-white/20 px-2 sm:px-3 ${
                   isActive('/admin/users') ? 'bg-white/20' : ''
                 }`}
                 size="sm"
               >
-                <Users size={18} />
-                <span className="hidden md:inline">Admin</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <Users size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">Admin</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+2
                 </span>
               </Button>
@@ -149,14 +149,14 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 onClick={() => router.push('/inventory')}
-                className={`gap-2 text-white hover:bg-white/20 ${
+                className={`gap-1 sm:gap-2 text-white hover:bg-white/20 px-2 sm:px-3 ${
                   isActive('/inventory') ? 'bg-white/20' : ''
                 }`}
                 size="sm"
               >
-                <Package size={18} />
-                <span className="hidden md:inline">Inventory</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <Package size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">Inventory</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+3
                 </span>
               </Button>
@@ -164,14 +164,14 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 onClick={() => router.push('/history')}
-                className={`gap-2 text-white hover:bg-white/20 ${
+                className={`gap-1 sm:gap-2 text-white hover:bg-white/20 px-2 sm:px-3 ${
                   isActive('/history') ? 'bg-white/20' : ''
                 }`}
                 size="sm"
               >
-                <BarChart3 size={18} />
-                <span className="hidden md:inline">History</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">History</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+4
                 </span>
               </Button>
@@ -179,12 +179,12 @@ export function AppHeader() {
               <Button
                 variant="ghost"
                 onClick={() => setShowLogoutDialog(true)}
-                className="gap-2 text-white bg-red-600 hover:bg-red-700"
+                className="gap-1 sm:gap-2 text-white bg-red-600 hover:bg-red-700 px-2 sm:px-3"
                 size="sm"
               >
-                <LogOut size={18} />
-                <span className="hidden md:inline">Logout</span>
-                <span className="hidden lg:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
+                <LogOut size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="hidden md:inline text-xs sm:text-sm">Logout</span>
+                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
                   Alt+5
                 </span>
               </Button>

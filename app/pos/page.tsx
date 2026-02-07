@@ -173,7 +173,7 @@ export default function POSPage() {
         </div>
         
         {/* Right Side - Receipt Style Cart (Compact) */}
-        <div className="w-full lg:w-[350px] bg-white shadow-2xl order-1 lg:order-2 flex flex-col">
+        <div className="w-full lg:w-[380px] xl:w-[420px] bg-white shadow-2xl order-1 lg:order-2 flex flex-col max-h-[40vh] lg:max-h-none">
           <POSCart
             items={cart}
             onUpdateQuantity={handleUpdateQuantity}
