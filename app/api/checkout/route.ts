@@ -1,12 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createBill, getProduct, updateProductStock } from '@/lib/db'
+import { createBill, getProduct, updateProductStock, getLastBillNumber } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
 
-// Generate unique bill number
-function generateBillNo(): string {
-  const timestamp = Date.now().toString(36).toUpperCase()
-  const random = Math.random().toString(36).substring(2, 8).toUpperCase()
-  return `BL-${timestamp}-${random}`
+// Generate unique bill number with WH prefix and sequential number
+async function generateBillNo(): Promise<string> {
+  const lastBillNo = await getLastBillNumber()
+  
+  if (!lastBillNo) {
+    // First bill
+    return 'WH00001'
+  }
+  
+  // Extract number from last bill (e.g., "WH00001" -> 1)
+  const match = lastBillNo.match(/WH(\d+)/)
+  if (match) {
+    const lastNumber = parseInt(match[1], 10)
+    const nextNumber = lastNumber + 1
+    // Format with 5 digits and leading zeros
+    return `WH${nextNumber.toString().padStart(5, '0')}`
+  }
+  
+  // Fallback if format doesn't match
+  return 'WH00001'
 }
 
 export async function POST(request: NextRequest) {
@@ -20,7 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { customerName, items } = await request.json()
+    const { customerName, items, amountPaid, changeReturned } = await request.json()
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -66,14 +81,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Create bill
-    const billNo = generateBillNo()
-    const bill = await createBill(billNo, customerName || 'Walk-in', billItems, totalAmount)
+    const billNo = await generateBillNo()
+    const bill = await createBill(
+      billNo, 
+      customerName || 'Walk-in', 
+      billItems, 
+      totalAmount,
+      amountPaid || totalAmount,
+      changeReturned !== undefined ? changeReturned : 0
+    )
 
     return NextResponse.json({
       billNo: bill.bill_no,
       customerName: bill.customer_name,
       items: billItems,
       totalAmount,
+      amountPaid: bill.amount_paid,
+      changeReturned: bill.change_returned,
       timestamp: bill.created_at,
     })
   } catch (error) {

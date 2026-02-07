@@ -23,6 +23,8 @@ interface Bill {
   customer_name: string
   items: BillItem[]
   total_amount: number
+  amount_paid: number | null
+  change_returned: number | null
   created_at: string
 }
 
@@ -38,6 +40,7 @@ export default function HistoryPage() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest')
   const [startDate, setStartDate] = useState('')
   const [endDate, setEndDate] = useState('')
+  const [expandedBillId, setExpandedBillId] = useState<number | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -68,6 +71,13 @@ export default function HistoryPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
   }
 
   const filteredBills = bills.filter((bill) => {
@@ -269,7 +279,7 @@ export default function HistoryPage() {
                 Showing {filteredBills.length} of {bills.length} bills
               </div>
               <div className="text-lg font-bold text-blue-600">
-                Total: Rs. {filteredBills.reduce((sum, bill) => sum + Number(bill.total_amount), 0).toFixed(2)}
+                Total: Rs. {formatCurrency(filteredBills.reduce((sum, bill) => sum + Number(bill.total_amount), 0))}
               </div>
             </div>
           </div>
@@ -292,60 +302,142 @@ export default function HistoryPage() {
                     <TableHead className="text-gray-800 font-bold">Date/Time</TableHead>
                     <TableHead className="text-right text-gray-800 font-bold">Items</TableHead>
                     <TableHead className="text-right text-gray-800 font-bold">Total</TableHead>
+                    <TableHead className="text-center text-gray-800 font-bold">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredBills.map((bill) => (
-                    <TableRow
-                      key={bill.id}
-                      className="cursor-pointer hover:bg-blue-50 border-b border-gray-200 transition-colors"
-                      onClick={() => {
-                        const items = Array.isArray(bill.items)
-                          ? bill.items
-                          : JSON.parse(bill.items as any)
-                        sessionStorage.setItem(
-                          `receipt_${bill.bill_no}`,
-                          JSON.stringify({
-                            billNo: bill.bill_no,
-                            customerName: bill.customer_name,
-                            items,
-                            totalAmount: bill.total_amount,
-                            timestamp: bill.created_at,
-                          })
-                        )
-                        router.push(`/receipt/${bill.bill_no}`)
-                      }}
-                    >
-                      <TableCell className="font-mono font-bold text-blue-600">
-                        {bill.bill_no}
-                      </TableCell>
-                      <TableCell className="text-gray-800">{bill.customer_name}</TableCell>
-                      <TableCell className="text-sm text-gray-600">
-                        {new Date(bill.created_at).toLocaleString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          hour12: true
-                        })}
-                      </TableCell>
-                      <TableCell className="text-right text-gray-800">
-                        {Array.isArray(bill.items)
-                          ? bill.items.reduce(
-                              (sum, item) => sum + (item.quantity || 0),
-                              0
-                            )
-                          : JSON.parse(bill.items as any).reduce(
-                              (sum: number, item: any) => sum + (item.quantity || 0),
+                  {filteredBills.map((bill) => {
+                    const items = Array.isArray(bill.items)
+                      ? bill.items
+                      : JSON.parse(bill.items as any)
+                    const isExpanded = expandedBillId === bill.id
+                    
+                    return (
+                      <>
+                        <TableRow
+                          key={bill.id}
+                          className="hover:bg-blue-50 border-b border-gray-200 transition-colors"
+                        >
+                          <TableCell className="font-mono font-bold text-blue-600">
+                            {bill.bill_no}
+                          </TableCell>
+                          <TableCell className="text-gray-800">{bill.customer_name}</TableCell>
+                          <TableCell className="text-sm text-gray-600">
+                            {new Date(bill.created_at).toLocaleString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: true
+                            })}
+                          </TableCell>
+                          <TableCell className="text-right text-gray-800">
+                            {items.reduce(
+                              (sum: number, item: BillItem) => sum + (item.quantity || 0),
                               0
                             )}
-                      </TableCell>
-                      <TableCell className="text-right font-bold text-green-600 text-lg">
-                        Rs. {Number(bill.total_amount).toFixed(2)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                          </TableCell>
+                          <TableCell className="text-right font-bold text-green-600 text-lg">
+                            Rs. {formatCurrency(Number(bill.total_amount))}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            <div className="flex gap-2 justify-center">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setExpandedBillId(isExpanded ? null : bill.id)}
+                                className="bg-blue-600 text-white hover:bg-blue-700"
+                              >
+                                {isExpanded ? 'Hide Details' : 'Show Details'}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  sessionStorage.setItem(
+                                    `receipt_${bill.bill_no}`,
+                                    JSON.stringify({
+                                      billNo: bill.bill_no,
+                                      customerName: bill.customer_name,
+                                      items,
+                                      totalAmount: bill.total_amount,
+                                      amountPaid: bill.amount_paid,
+                                      changeReturned: bill.change_returned,
+                                      timestamp: bill.created_at,
+                                    })
+                                  )
+                                  router.push(`/receipt/${bill.bill_no}`)
+                                }}
+                                className="bg-green-600 text-white hover:bg-green-700"
+                              >
+                                View Receipt
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                        {isExpanded && (
+                          <TableRow key={`${bill.id}-details`} className="bg-gray-50">
+                            <TableCell colSpan={6} className="p-6">
+                              <div className="space-y-4">
+                                {/* Items List */}
+                                <div>
+                                  <h3 className="text-lg font-bold text-gray-900 mb-3">Items</h3>
+                                  <Table>
+                                    <TableHeader>
+                                      <TableRow className="bg-gray-200">
+                                        <TableHead className="text-gray-800 font-bold">Product</TableHead>
+                                        <TableHead className="text-right text-gray-800 font-bold">Price</TableHead>
+                                        <TableHead className="text-right text-gray-800 font-bold">Qty</TableHead>
+                                        <TableHead className="text-right text-gray-800 font-bold">Total</TableHead>
+                                      </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                      {items.map((item: BillItem, idx: number) => (
+                                        <TableRow key={idx} className="border-b">
+                                          <TableCell className="text-gray-800 font-medium">{item.name}</TableCell>
+                                          <TableCell className="text-right text-gray-700">Rs. {formatCurrency(item.price)}</TableCell>
+                                          <TableCell className="text-right text-gray-700">{item.quantity}</TableCell>
+                                          <TableCell className="text-right text-gray-900 font-semibold">Rs. {formatCurrency(item.total)}</TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </div>
+
+                                {/* Payment Details */}
+                                <div className="border-t-2 border-gray-300 pt-4 mt-4">
+                                  <h3 className="text-lg font-bold text-gray-900 mb-3">Payment Details</h3>
+                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div className="bg-white p-4 rounded-lg border-2 border-gray-300">
+                                      <p className="text-sm text-gray-600 font-semibold mb-1">Subtotal</p>
+                                      <p className="text-2xl font-bold text-gray-900">Rs. {formatCurrency(Number(bill.total_amount))}</p>
+                                    </div>
+                                    {bill.amount_paid !== null && (
+                                      <div className="bg-white p-4 rounded-lg border-2 border-blue-300">
+                                        <p className="text-sm text-gray-600 font-semibold mb-1">Amount Paid</p>
+                                        <p className="text-2xl font-bold text-blue-600">Rs. {formatCurrency(Number(bill.amount_paid))}</p>
+                                      </div>
+                                    )}
+                                    {bill.change_returned !== null && (
+                                      <div className={`bg-white p-4 rounded-lg border-2 ${Number(bill.change_returned) >= 0 ? 'border-green-300' : 'border-red-300'}`}>
+                                        <p className="text-sm text-gray-600 font-semibold mb-1">
+                                          {Number(bill.change_returned) >= 0 ? 'Change' : 'Shortage'}
+                                        </p>
+                                        <p className={`text-2xl font-bold ${Number(bill.change_returned) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                          Rs. {formatCurrency(Math.abs(Number(bill.change_returned)))}
+                                        </p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    )
+                  })}
                 </TableBody>
               </Table>
             </div>

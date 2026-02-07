@@ -85,7 +85,7 @@ export default function POSPage() {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id))
   }
 
-  const handleCheckout = async (customerName: string) => {
+  const handleCheckout = async (customerName: string, amountPaid: number, changeReturned: number) => {
     if (cart.length === 0) return
 
     setCheckoutLoading(true)
@@ -96,6 +96,8 @@ export default function POSPage() {
         body: JSON.stringify({
           customerName,
           items: cart,
+          amountPaid,
+          changeReturned,
         }),
       })
 
@@ -125,16 +127,6 @@ export default function POSPage() {
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      // F9 for checkout - works from anywhere
-      if (e.key === 'F9' && cart.length > 0) {
-        e.preventDefault()
-        const customerName = prompt('Enter customer name:')
-        if (customerName !== null) {
-          handleCheckout(customerName || 'Walk-in')
-        }
-        return
-      }
-
       // ESC to clear cart
       if (e.key === 'Escape' && cart.length > 0) {
         e.preventDefault()

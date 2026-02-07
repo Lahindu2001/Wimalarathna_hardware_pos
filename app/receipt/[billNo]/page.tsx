@@ -18,6 +18,8 @@ interface ReceiptData {
     total: number
   }[]
   totalAmount: number
+  amountPaid?: number
+  changeReturned?: number
   timestamp: string
 }
 
@@ -27,6 +29,11 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
   const [receipt, setReceipt] = useState<ReceiptData | null>(null)
   const [loading, setLoading] = useState(true)
   const resolvedParams = use(params)
+
+  // Format number with commas
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
 
   useEffect(() => {
     const billNo = decodeURIComponent(resolvedParams.billNo)
@@ -265,9 +272,15 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
     })}\n`
     csv += `\nProduct,Price,Quantity,Total\n`
     data.items.forEach((item) => {
-      csv += `"${item.name}","${Number(item.price).toFixed(2)}","${item.quantity}","${Number(item.total).toFixed(2)}"\n`
+      csv += `"${item.name}","${formatCurrency(Number(item.price))}","${item.quantity}","${formatCurrency(Number(item.total))}"\n`
     })
-    csv += `\nTotal Amount,Rs. ${Number(data.totalAmount).toFixed(2)}\n`
+    csv += `\nTotal Amount,Rs. ${formatCurrency(Number(data.totalAmount))}\n`
+    if (data.amountPaid !== undefined) {
+      csv += `Amount Paid,Rs. ${formatCurrency(Number(data.amountPaid))}\n`
+    }
+    if (data.changeReturned !== undefined && data.changeReturned !== 0) {
+      csv += `${data.changeReturned >= 0 ? 'Change' : 'Shortage'},Rs. ${formatCurrency(Math.abs(Number(data.changeReturned)))}\n`
+    }
     return csv
   }
 
@@ -330,7 +343,6 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             </h1>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Hospital Opposite, Dompe</p>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Phone: 0112409682</p>
-            <p style={{ fontSize: '12px', margin: '2px 0' }}>Email: wimalarathne@hardware.lk</p>
           </div>
 
           {/* Invoice Details */}
@@ -381,10 +393,10 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                     <span className="flex-1 font-semibold">{item.name}</span>
                     <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
                     <span style={{ width: '50px', textAlign: 'right' }}>
-                      {Number(item.price).toFixed(2)}
+                      {formatCurrency(Number(item.price))}
                     </span>
                     <span style={{ width: '60px', textAlign: 'right', fontWeight: 'bold' }}>
-                      {Number(item.total).toFixed(2)}
+                      {formatCurrency(Number(item.total))}
                     </span>
                   </div>
                 </div>
@@ -402,14 +414,30 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             </div>
             <div className="flex justify-between">
               <span className="font-bold">Total Amount:</span>
-              <span className="font-bold">Rs. {Number(receipt.totalAmount).toFixed(2)}</span>
+              <span className="font-bold">Rs. {formatCurrency(Number(receipt.totalAmount))}</span>
             </div>
+            {receipt.amountPaid !== undefined && (
+              <>
+                <div className="flex justify-between" style={{ marginTop: '4px' }}>
+                  <span>Amount Paid:</span>
+                  <span className="font-bold">Rs. {formatCurrency(Number(receipt.amountPaid))}</span>
+                </div>
+                {receipt.changeReturned !== undefined && receipt.changeReturned !== 0 && (
+                  <div className="flex justify-between">
+                    <span>{receipt.changeReturned >= 0 ? 'Change:' : 'Shortage:'}</span>
+                    <span className={`font-bold ${receipt.changeReturned >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                      Rs. {formatCurrency(Math.abs(Number(receipt.changeReturned)))}
+                    </span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           {/* Footer */}
           <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
             <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
-            <p style={{ fontSize: '10px', fontStyle: 'italic', margin: '2px 0' }}>Provided by helacode.lk</p>
+            <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>Powered by HelaCode | Tel: 075 2 4 8 16 32</p>
             <div className="cut-line" style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
         </div>

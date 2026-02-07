@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS bill_history (
     customer_name VARCHAR(100),
     items JSONB NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
+    amount_paid DECIMAL(10, 2),
+    change_returned DECIMAL(10, 2),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

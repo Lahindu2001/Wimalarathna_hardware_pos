@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Search, ShoppingBag, X } from 'lucide-react'
 
 interface Product {
@@ -27,6 +29,11 @@ interface POSWorkflowProps {
 }
 
 export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkflowProps) {
+  // Format number with commas
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  }
+
   const [searchQuery, setSearchQuery] = useState('')
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
@@ -35,6 +42,9 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
   const [price, setPrice] = useState('')
   const [cart, setCart] = useState<CartItem[]>([])
   const [highlightedIndex, setHighlightedIndex] = useState(0)
+  const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
+  const [customerName, setCustomerName] = useState('')
+  const [amountPaid, setAmountPaid] = useState('')
   
   const searchRef = useRef<HTMLInputElement>(null)
   const qtyRef = useRef<HTMLInputElement>(null)
@@ -181,34 +191,74 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
     setCart(cart.filter(item => item.id !== id))
   }
 
-  const handleFinalCheckout = useCallback(() => {
+  const handleOpenCheckout = useCallback(() => {
     if (cart.length === 0) {
       alert('Cart is empty')
       return
     }
+    setShowCheckoutDialog(true)
+    setCustomerName('')
+    setAmountPaid('')
+  }, [cart])
 
-    const customerName = prompt('Enter customer name:')
-    if (customerName !== null) {
-      onCheckout(cart, customerName || 'Walk-in')
-      setCart([])
+  const handleConfirmCheckout = () => {
+    const paid = parseFloat(amountPaid)
+    if (isNaN(paid) || paid <= 0 || !amountPaid) {
+      alert('Please enter amount paid')
+      return
     }
-  }, [cart, onCheckout])
+
+    const amountDue = paid - total
+    
+    // Payment is short
+    if (amountDue < 0) {
+      const shortage = Math.abs(amountDue)
+      const confirmShort = confirm(
+        `⚠️ PAYMENT SHORT\n\n` +
+        `Subtotal: Rs. ${formatCurrency(total)}\n` +
+        `Amount Paid: Rs. ${formatCurrency(paid)}\n` +
+        `Shortage: Rs. ${formatCurrency(shortage)}\n\n` +
+        `Proceed with partial payment?`
+      )
+      if (!confirmShort) return
+    }
+    
+    // Payment is exact or overpaid
+    if (amountDue >= 0) {
+      const change = amountDue
+      if (change > 0) {
+        alert(
+          `✓ PAYMENT CONFIRMED\n\n` +
+          `Change to return: Rs. ${formatCurrency(change)}`
+        )
+      } else {
+        alert('✓ PAYMENT CONFIRMED\n\nExact amount received.')
+      }
+    }
+    
+    onCheckout(cart, customerName || 'Walk-in')
+    setCart([])
+    setShowCheckoutDialog(false)
+    setCustomerName('')
+    setAmountPaid('')
+  }
 
   // F9 keyboard shortcut for checkout
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === 'F9' && cart.length > 0) {
         e.preventDefault()
-        handleFinalCheckout()
+        handleOpenCheckout()
       }
     }
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [cart, handleFinalCheckout])
+  }, [cart, handleOpenCheckout])
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
+    <>
     <div className="h-full flex items-center justify-center p-6 bg-gray-50">
       <div className="w-full max-w-4xl">
         {/* Cart Summary Bar at Top */}
@@ -227,7 +277,7 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
               </div>
               <div className="text-right">
                 <p className="text-sm opacity-90">Total</p>
-                <p className="text-3xl font-bold">Rs. {total.toFixed(2)}</p>
+                <p className="text-3xl font-bold">Rs. {formatCurrency(total)}</p>
               </div>
             </div>
           </div>
@@ -391,13 +441,13 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
           {/* Checkout Button */}
           {cart.length > 0 && (
             <Button
-              onClick={handleFinalCheckout}
+              onClick={handleOpenCheckout}
               disabled={loading}
               className="w-full h-16 bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold"
             >
               {loading ? 'Processing...' : (
                 <span className="flex items-center justify-center gap-3">
-                  Checkout - Rs. {total.toFixed(2)}
+                  Checkout - Rs. {formatCurrency(total)}
                   <span className="text-sm bg-white/20 px-2 py-1 rounded">Press F9</span>
                 </span>
               )}
@@ -407,5 +457,115 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
         </div>
       </div>
     </div>
+
+      {/* Checkout Payment Dialog */}
+      <Dialog open={showCheckoutDialog} onOpenChange={setShowCheckoutDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-center">
+              Checkout Payment
+            </DialogTitle>
+            <DialogDescription className="text-center text-lg text-gray-600 mt-2">
+              Total: <span className="font-bold text-blue-600">Rs. {formatCurrency(total)}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 py-4">
+            {/* Customer Name */}
+            <div className="space-y-2">
+              <Label htmlFor="customerName" className="text-base font-medium">Customer Name <span className="text-gray-500 text-sm">(Optional - defaults to Walk-in)</span></Label>
+              <Input
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    document.getElementById('amountPaid')?.focus()
+                  }
+                }}
+                placeholder="Enter customer name (optional)"
+                className="h-12 text-lg"
+                autoFocus
+              />
+            </div>
+
+            {/* Amount Paid */}
+            <div className="space-y-2">
+              <Label htmlFor="amountPaid" className="text-base font-medium">Amount Paid</Label>
+              <Input
+                id="amountPaid"
+                type="number"
+                step="0.01"
+                value={amountPaid}
+                onChange={(e) => setAmountPaid(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleConfirmCheckout()
+                  }
+                }}
+                placeholder="0.00"
+                className="h-12 text-lg"
+              />
+            </div>
+
+            {/* Amount Due */}
+            <div className="space-y-2">
+              <Label className="text-base font-medium">
+                {amountPaid && parseFloat(amountPaid) > 0
+                  ? parseFloat(amountPaid) >= total
+                    ? '✓ Change to Return'
+                    : '⚠ Payment Shortage'
+                  : 'Amount Due (Change)'}
+              </Label>
+              <Input
+                value={
+                  amountPaid && parseFloat(amountPaid) > 0
+                    ? `Rs. ${formatCurrency(Math.abs(parseFloat(amountPaid) - total))}`
+                    : 'Rs. 0.00'
+                }
+                readOnly
+                className={`h-12 text-lg font-bold ${
+                  amountPaid && parseFloat(amountPaid) >= total
+                    ? 'bg-green-100 text-green-700 border-green-500'
+                    : amountPaid && parseFloat(amountPaid) > 0
+                    ? 'bg-red-100 text-red-700 border-red-500'
+                    : 'bg-gray-100 text-gray-700'
+                }`}
+              />
+              {amountPaid && parseFloat(amountPaid) > 0 && parseFloat(amountPaid) < total && (
+                <p className="text-sm text-red-600 font-medium">
+                  Short by Rs. {formatCurrency(total - parseFloat(amountPaid))}
+                </p>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowCheckoutDialog(false)}
+              className="h-12 text-base"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleConfirmCheckout}
+              disabled={!amountPaid || parseFloat(amountPaid) <= 0}
+              className={`h-12 text-base ${
+                amountPaid && parseFloat(amountPaid) >= total
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }`}
+            >
+              {amountPaid && parseFloat(amountPaid) >= total
+                ? '✓ Confirm Payment'
+                : 'Confirm Payment'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
