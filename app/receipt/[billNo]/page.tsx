@@ -258,7 +258,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
   }
 
   const generateCSV = (data: ReceiptData): string => {
-    let csv = `Wimalrathna Hardware Receipt\n`
+    let csv = `WIMALARATHNA HARDWARE Receipt\n`
     csv += `Bill Number: ${data.billNo}\n`
     csv += `Customer: ${data.customerName}\n`
     csv += `Date: ${new Date(data.timestamp).toLocaleString('en-US', {
@@ -339,7 +339,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           {/* Header */}
           <div className="text-center border-b-2 border-gray-800 pb-2 mb-2">
             <h1 className="font-bold uppercase" style={{ fontSize: '16px', letterSpacing: '0.5px' }}>
-              Wimalrathna Hardware
+              WIMALARATHNA HARDWARE
             </h1>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Hospital Opposite, Dompe</p>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Phone: 0112409682</p>
@@ -428,11 +428,11 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   if (!isNaN(change) && change !== 0) {
                     return (
                       <div className="flex justify-between">
-                        <span>{change >= 0 ? 'Change:' : 'Shortage:'}</span>
+                        <span>{change >= 0 ? 'Change:' : 'Outstanding Amount:'}</span>
                         <span className={`font-bold ${change >= 0 ? 'text-green-700' : 'text-red-700'}`}>
                           {change >= 0
                             ? `Rs. ${formatCurrency(Math.abs(change))}`
-                            : `-Rs. ${formatCurrency(Math.abs(change))}`}
+                            : `- Rs. ${formatCurrency(Math.abs(change))}`}
                         </span>
                       </div>
                     );
