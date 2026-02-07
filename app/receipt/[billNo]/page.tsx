@@ -343,6 +343,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             </h1>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Hospital Opposite, Dompe</p>
             <p style={{ fontSize: '12px', margin: '2px 0' }}>Phone: 0112409682</p>
+            <p style={{ fontSize: '12px', margin: '2px 0' }}>Email: info.wimalarathnahardware@gmail.com</p>
           </div>
 
           {/* Invoice Details */}
@@ -412,9 +413,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                 {receipt.items.reduce((sum, item) => sum + item.quantity, 0)}
               </span>
             </div>
-            <div className="flex justify-between">
-              <span className="font-bold">Total Amount:</span>
-              <span className="font-bold">Rs. {formatCurrency(Number(receipt.totalAmount))}</span>
+            <div className="flex justify-between" style={{ alignItems: 'center', margin: '8px 0' }}>
+              <span className="font-bold" style={{ fontSize: '15px' }}>Total Amount:</span>
+              <span className="font-bold" style={{ fontSize: '22px', color: '#111827', letterSpacing: '1px' }}>Rs. {formatCurrency(Number(receipt.totalAmount))}</span>
             </div>
             {receipt.amountPaid !== undefined && (
               <>
@@ -438,6 +439,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
             <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
             <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>Powered by HelaCode | Tel: 075 2 4 8 16 32</p>
+            <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>www.helacode.com</p>
             <div className="cut-line" style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
         </div>
