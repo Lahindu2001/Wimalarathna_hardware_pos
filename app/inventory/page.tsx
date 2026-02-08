@@ -218,7 +218,7 @@ export default function InventoryPage() {
     }
   }
   const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price || !newProduct.stock) {
+    if (!newProduct.name || !newProduct.price) {
       alert('All fields are required')
       return
     }
@@ -230,7 +230,7 @@ export default function InventoryPage() {
         body: JSON.stringify({
           name: newProduct.name,
           price: parseFloat(newProduct.price),
-          stock: parseInt(newProduct.stock),
+          stock: 9999,
         }),
       })
 
@@ -238,7 +238,7 @@ export default function InventoryPage() {
 
       const product = await res.json()
       setProducts((prev) => [...prev, product])
-      setNewProduct({ name: '', price: '', stock: '' })
+      setNewProduct({ name: '', price: '' })
       setShowAddDialog(false)
     } catch (error) {
       console.error('[v0] Failed to add product:', error)
@@ -609,42 +609,7 @@ export default function InventoryPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="stock" className="text-gray-900 font-semibold">Stock Quantity</Label>
-              <Input
-                ref={stockRef}
-                id="stock"
-                type="number"
-                min="0"
-                step="1"
-                value={newProduct.stock}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, stock: e.target.value })
-                }
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(e) => {
-                  if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                    e.preventDefault()
-                  }
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    // removed reorderLevelRef
-                  }
-                  if (e.shiftKey && e.key === 'ArrowUp') {
-                    e.preventDefault()
-                    priceRef.current?.focus()
-                    priceRef.current?.select()
-                  }
-                  if (e.shiftKey && e.key === 'ArrowDown') {
-                    e.preventDefault()
-                    // removed reorderLevelRef
-                    // removed reorderLevelRef
-                  }
-                }}
-                placeholder="25"
-                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
-              />
-            </div>
+            {/* Stock input hidden, stock always defaults to 9999 */}
 
             {/* Reorder Level input removed */}
 
