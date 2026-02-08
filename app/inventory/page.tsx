@@ -564,10 +564,15 @@ export default function InventoryPage() {
                     priceRef.current?.focus()
                     priceRef.current?.select()
                   }
-                  if (e.shiftKey && e.key === 'ArrowDown') {
+                  if (e.key === 'ArrowDown') {
                     e.preventDefault()
                     priceRef.current?.focus()
                     priceRef.current?.select()
+                  }
+                  if (e.key === 'ArrowUp') {
+                    e.preventDefault()
+                    nameRef.current?.focus()
+                    nameRef.current?.select()
                   }
                 }}
                 placeholder="e.g., Hammer 500g"
@@ -590,18 +595,16 @@ export default function InventoryPage() {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    stockRef.current?.focus()
-                    stockRef.current?.select()
+                    addButtonRef.current?.focus()
                   }
-                  if (e.shiftKey && e.key === 'ArrowUp') {
+                  if (e.key === 'ArrowUp') {
                     e.preventDefault()
                     nameRef.current?.focus()
                     nameRef.current?.select()
                   }
-                  if (e.shiftKey && e.key === 'ArrowDown') {
+                  if (e.key === 'ArrowDown') {
                     e.preventDefault()
-                    stockRef.current?.focus()
-                    stockRef.current?.select()
+                    addButtonRef.current?.focus()
                   }
                 }}
                 placeholder="450.00"
