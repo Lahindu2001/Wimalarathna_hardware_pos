@@ -302,7 +302,7 @@ export function POSCart({
                             onClick={() => {
                               if (onUpdatePrice) {
                                 const newDiscount = Math.max(0, Math.min(100, discount - 1));
-                                onUpdatePrice(item.id, item.price, newDiscount);
+                                onUpdatePrice(item.id, item.price);
                               }
                             }}
                             className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
@@ -320,7 +320,7 @@ export function POSCart({
                               const val = parseFloat(e.target.value);
                               if (!isNaN(val) && val >= 0 && val <= 100) {
                                 if (onUpdatePrice) {
-                                  onUpdatePrice(item.id, item.price, val);
+                                  onUpdatePrice(item.id, item.price);
                                 }
                               }
                             }}
@@ -331,7 +331,7 @@ export function POSCart({
                             onClick={() => {
                               if (onUpdatePrice) {
                                 const newDiscount = Math.max(0, Math.min(100, discount + 1));
-                                onUpdatePrice(item.id, item.price, newDiscount);
+                                onUpdatePrice(item.id, item.price);
                               }
                             }}
                             className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
