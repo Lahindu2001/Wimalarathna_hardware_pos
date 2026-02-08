@@ -93,7 +93,7 @@ export function AppHeader() {
           <div className="flex items-center justify-between gap-2 md:gap-4">
             {/* Company Info */}
             <div className="min-w-0 flex-shrink">
-              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">Wimalrathna Hardware</h1>
+              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">Wimalarathna Hardware</h1>
               <p className="text-[10px] sm:text-xs md:text-sm text-blue-100 hidden sm:block">
                 Hospital Opposite, Dompe | Phone: 0112409682
               </p>

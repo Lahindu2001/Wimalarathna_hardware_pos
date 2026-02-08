@@ -20,7 +20,7 @@ export default function Home() {
           </svg>
         </div>
         <p className="text-gray-900 text-lg font-medium">Loading...</p>
-        <p className="text-gray-600 text-sm mt-2">Wimalrathna Hardware</p>
+        <p className="text-gray-600 text-sm mt-2">Wimalarathna Hardware</p>
       </div>
     </div>
   )

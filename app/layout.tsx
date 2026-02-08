@@ -8,7 +8,7 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Wimalrathna Hardware POS',
+  title: 'Wimalarathna Hardware POS',
   description: 'Professional Point of Sale system for hardware retail',
   generator: 'v0.app',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
