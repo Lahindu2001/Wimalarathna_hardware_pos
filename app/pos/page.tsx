@@ -85,7 +85,13 @@ export default function POSPage() {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id))
   }
 
-  const handleCheckout = async (customerName: string, amountPaid: number, changeReturned: number) => {
+  const handleCheckout = async (
+    customerName: string,
+    amountPaid: number,
+    changeReturned: number,
+    customerReturnBalance?: number,
+    enableReturnBalance?: boolean
+  ) => {
     if (cart.length === 0) return
 
     setCheckoutLoading(true)
@@ -98,22 +104,20 @@ export default function POSPage() {
           items: cart,
           amountPaid,
           changeReturned,
+          customerReturnBalance: enableReturnBalance ? customerReturnBalance : undefined,
+          enableReturnBalance,
         }),
       })
 
       if (!res.ok) throw new Error('Checkout failed')
 
       const data = await res.json()
-      
       // Store receipt data in session storage
       sessionStorage.setItem(`receipt_${data.billNo}`, JSON.stringify(data))
-      
       // Redirect to receipt page
       router.push(`/receipt/${data.billNo}`)
-      
       // Reset cart
       setCart([])
-      
       // Refresh products to update stock
       fetchProducts()
     } catch (error) {

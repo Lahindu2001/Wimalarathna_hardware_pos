@@ -20,6 +20,8 @@ interface ReceiptData {
   totalAmount: number
   amountPaid?: number
   changeReturned?: number
+  customerReturnBalance?: number
+  enableReturnBalance?: boolean
   timestamp: string
 }
 
@@ -417,7 +419,30 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               <span className="font-bold" style={{ fontSize: '15px' }}>Total Amount:</span>
               <span className="font-bold" style={{ fontSize: '22px', color: '#111827', letterSpacing: '1px' }}>Rs. {formatCurrency(Number(receipt.totalAmount))}</span>
             </div>
-            {receipt.amountPaid !== undefined && (
+            {(receipt.enableReturnBalance && receipt.customerReturnBalance !== undefined) ? (
+              <>
+                <div className="flex justify-between" style={{ marginTop: '4px' }}>
+                  <span>Customer Return Balance:</span>
+                  <span className="font-bold">Rs. {formatCurrency(Number(receipt.customerReturnBalance))}</span>
+                </div>
+                {(() => {
+                  const change = Number(receipt.customerReturnBalance) - Number(receipt.totalAmount);
+                  if (!isNaN(change) && change !== 0) {
+                    return (
+                      <div className="flex justify-between">
+                        <span>{change >= 0 ? 'Balance:' : 'Outstanding Amount:'}</span>
+                        <span className={`font-bold ${change >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                          {change >= 0
+                            ? `Rs. ${formatCurrency(Math.abs(change))}`
+                            : `- Rs. ${formatCurrency(Math.abs(change))}`}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </>
+            ) : receipt.amountPaid !== undefined ? (
               <>
                 <div className="flex justify-between" style={{ marginTop: '4px' }}>
                   <span>Amount Paid:</span>
@@ -440,7 +465,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   return null;
                 })()}
               </>
-            )}
+            ) : null}
           </div>
 
           {/* Footer */}

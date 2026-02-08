@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { customerName, items, amountPaid, changeReturned } = await request.json()
+    const { customerName, items, amountPaid, changeReturned, customerReturnBalance, enableReturnBalance } = await request.json()
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -88,7 +88,9 @@ export async function POST(request: NextRequest) {
       billItems, 
       totalAmount,
       amountPaid || totalAmount,
-      changeReturned !== undefined ? changeReturned : 0
+      changeReturned !== undefined ? changeReturned : 0,
+      customerReturnBalance !== undefined ? customerReturnBalance : 0,
+      enableReturnBalance === true
     )
 
     return NextResponse.json({
@@ -98,6 +100,8 @@ export async function POST(request: NextRequest) {
       totalAmount,
       amountPaid: bill.amount_paid,
       changeReturned: bill.change_returned,
+      customerReturnBalance: bill.customer_return_balance,
+      enableReturnBalance: bill.enable_return_balance,
       timestamp: bill.created_at,
     })
   } catch (error) {

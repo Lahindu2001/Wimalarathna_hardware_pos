@@ -20,7 +20,7 @@ interface POSCartProps {
   items: CartItem[]
   onUpdateQuantity: (id: number, quantity: number) => void
   onRemove: (id: number) => void
-  onCheckout: (customerName: string, amountPaid: number, changeReturned: number) => void
+  onCheckout: (customerName: string, amountPaid: number, changeReturned: number, customerReturnBalance?: number, enableReturnBalance?: boolean) => void
   onUpdatePrice?: (id: number, price: number) => void
   loading?: boolean
 }
@@ -43,7 +43,10 @@ export function POSCart({
   const [showCheckoutDialog, setShowCheckoutDialog] = useState(false)
   const [customerName, setCustomerName] = useState('')
   const [amountPaid, setAmountPaid] = useState('')
-  
+  // Customer Return Balance state
+  const [customerReturnBalance, setCustomerReturnBalance] = useState('0')
+  const [enableReturnBalance, setEnableReturnBalance] = useState(false)
+
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const productCount = items.length
@@ -56,17 +59,24 @@ export function POSCart({
     setShowCheckoutDialog(true)
     setCustomerName('')
     setAmountPaid('')
+    setCustomerReturnBalance('0')
+    setEnableReturnBalance(false)
   }, [items.length])
 
   const handleConfirmCheckout = () => {
-    const paid = parseFloat(amountPaid)
-    if (isNaN(paid) || paid <= 0 || !amountPaid) {
-      alert('Please enter amount paid')
+    let paid = parseFloat(amountPaid)
+    let returnBalance = parseFloat(customerReturnBalance)
+    if (enableReturnBalance) {
+      if (isNaN(returnBalance)) returnBalance = 0
+      paid = returnBalance
+    }
+    if (isNaN(paid) || paid < 0) {
+      alert('Please enter a valid amount')
       return
     }
 
     const amountDue = paid - total
-    
+
     // Payment is short
     if (amountDue < 0) {
       const shortage = Math.abs(amountDue)
@@ -79,7 +89,7 @@ export function POSCart({
       )
       if (!confirmShort) return
     }
-    
+
     // Payment is exact or overpaid
     if (amountDue >= 0) {
       const change = amountDue
@@ -92,11 +102,19 @@ export function POSCart({
         alert('✓ PAYMENT CONFIRMED\n\nExact amount received.')
       }
     }
-    
-    onCheckout(customerName || 'Walk-in', paid, amountDue)
+
+    onCheckout(
+      customerName || 'Walk-in',
+      paid,
+      amountDue,
+      enableReturnBalance ? parseFloat(customerReturnBalance) : undefined,
+      enableReturnBalance
+    )
     setShowCheckoutDialog(false)
     setCustomerName('')
     setAmountPaid('')
+    setCustomerReturnBalance('0')
+    setEnableReturnBalance(false)
   }
 
   const handlePriceEdit = (item: CartItem) => {
@@ -346,15 +364,28 @@ export function POSCart({
               />
             </div>
 
-            {/* Amount Paid */}
+            {/* Amount Paid or Customer Return Balance */}
             <div className="space-y-1.5 sm:space-y-2">
-              <Label htmlFor="amountPaid" className="text-sm sm:text-base font-medium">Amount Paid</Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor={enableReturnBalance ? 'customerReturnBalance' : 'amountPaid'} className="text-sm sm:text-base font-medium">
+                  {enableReturnBalance ? 'Customer Return Balance' : 'Amount Paid'}
+                </Label>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant={enableReturnBalance ? 'default' : 'outline'}
+                  onClick={() => setEnableReturnBalance((v) => !v)}
+                  className="ml-2 px-2 py-1 text-xs"
+                >
+                  {enableReturnBalance ? 'Disable' : 'Enable'}
+                </Button>
+              </div>
               <Input
-                id="amountPaid"
+                id={enableReturnBalance ? 'customerReturnBalance' : 'amountPaid'}
                 type="number"
                 step="0.01"
-                value={amountPaid}
-                onChange={(e) => setAmountPaid(e.target.value)}
+                value={enableReturnBalance ? customerReturnBalance : amountPaid}
+                onChange={(e) => enableReturnBalance ? setCustomerReturnBalance(e.target.value) : setAmountPaid(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
@@ -363,36 +394,38 @@ export function POSCart({
                 }}
                 placeholder="0.00"
                 className="h-10 sm:h-12 text-sm sm:text-base md:text-lg"
+                disabled={!enableReturnBalance && enableReturnBalance !== undefined && enableReturnBalance !== null && enableReturnBalance}
+                readOnly={enableReturnBalance ? false : false}
               />
             </div>
 
             {/* Amount Due */}
             <div className="space-y-1.5 sm:space-y-2">
               <Label className="text-base font-medium">
-                {amountPaid && parseFloat(amountPaid) > 0
-                  ? parseFloat(amountPaid) >= total
+                {(enableReturnBalance ? customerReturnBalance : amountPaid) && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) > 0
+                  ? parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) >= total
                     ? '\u2713 Change to Return'
                     : '\u26a0 Payment Shortage'
                   : 'Amount Due (Change)'}
               </Label>
               <Input
                 value={
-                  amountPaid && parseFloat(amountPaid) > 0
-                    ? `Rs. ${formatCurrency(Math.abs(parseFloat(amountPaid) - total))}`
+                  (enableReturnBalance ? customerReturnBalance : amountPaid) && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) > 0
+                    ? `Rs. ${formatCurrency(Math.abs(parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) - total))}`
                     : 'Rs. 0.00'
                 }
                 readOnly
                 className={`h-12 text-lg font-bold ${
-                  amountPaid && parseFloat(amountPaid) >= total
+                  (enableReturnBalance ? customerReturnBalance : amountPaid) && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) >= total
                     ? 'bg-green-100 text-green-700 border-green-500'
-                    : amountPaid && parseFloat(amountPaid) > 0
+                    : (enableReturnBalance ? customerReturnBalance : amountPaid) && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) > 0
                     ? 'bg-red-100 text-red-700 border-red-500'
                     : 'bg-gray-100 text-gray-700'
                 }`}
               />
-              {amountPaid && parseFloat(amountPaid) > 0 && parseFloat(amountPaid) < total && (
+              {(enableReturnBalance ? customerReturnBalance : amountPaid) && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) > 0 && parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid) < total && (
                 <p className="text-sm text-red-600 font-medium">
-                  Short by Rs. {formatCurrency(total - parseFloat(amountPaid))}
+                  Short by Rs. {formatCurrency(total - parseFloat(enableReturnBalance ? customerReturnBalance : amountPaid))}
                 </p>
               )}
             </div>
@@ -409,14 +442,22 @@ export function POSCart({
             <Button
               type="button"
               onClick={handleConfirmCheckout}
-              disabled={!amountPaid || parseFloat(amountPaid) <= 0}
+              disabled={
+                (enableReturnBalance
+                  ? !customerReturnBalance || parseFloat(customerReturnBalance) <= 0
+                  : !amountPaid || parseFloat(amountPaid) <= 0)
+              }
               className={`h-12 text-base ${
-                amountPaid && parseFloat(amountPaid) >= total
+                (enableReturnBalance
+                  ? parseFloat(customerReturnBalance) >= total
+                  : parseFloat(amountPaid) >= total)
                   ? 'bg-green-600 hover:bg-green-700'
                   : 'bg-blue-600 hover:bg-blue-700'
               }`}
             >
-              {amountPaid && parseFloat(amountPaid) >= total
+              {(enableReturnBalance
+                ? parseFloat(customerReturnBalance) >= total
+                : parseFloat(amountPaid) >= total)
                 ? '\u2713 Confirm Payment'
                 : 'Confirm Payment'}
             </Button>
