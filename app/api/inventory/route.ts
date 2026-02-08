@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { name, price, stock, reorder_level } = await request.json()
+    const { name, price, stock } = await request.json()
 
     if (!name || !price || stock === undefined) {
       return NextResponse.json(
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await query(
-      'INSERT INTO products (name, price, stock, reorder_level) VALUES ($1, $2, $3, $4) RETURNING *',
-      [name, price, stock, reorder_level || 50]
+      'INSERT INTO products (name, price, stock) VALUES ($1, $2, $3) RETURNING *',
+      [name, price, stock]
     )
 
     return NextResponse.json(result.rows[0])
@@ -48,7 +48,7 @@ export async function PUT(request: NextRequest) {
       )
     }
 
-    const { id, name, price, stock, reorder_level } = await request.json()
+    const { id, name, price, stock } = await request.json()
 
     if (!id) {
       return NextResponse.json(
@@ -58,8 +58,8 @@ export async function PUT(request: NextRequest) {
     }
 
     const result = await query(
-      'UPDATE products SET name = $1, price = $2, stock = $3, reorder_level = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *',
-      [name, price, stock, reorder_level || 50, id]
+      'UPDATE products SET name = $1, price = $2, stock = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
+      [name, price, stock, id]
     )
 
     if (result.rows.length === 0) {

@@ -16,7 +16,6 @@ interface Product {
   name: string
   price: number
   stock: number
-  reorder_level: number
 }
 
 interface CategoryCount {
@@ -29,7 +28,6 @@ interface EditingProduct {
   name?: string
   price?: string | number
   stock?: string | number
-  reorder_level?: string | number
 }
 
 export default function InventoryPage() {
@@ -39,7 +37,7 @@ export default function InventoryPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editValues, setEditValues] = useState<EditingProduct>({})
   const [showAddDialog, setShowAddDialog] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', reorder_level: '50' })
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -47,7 +45,7 @@ export default function InventoryPage() {
   const nameRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
   const stockRef = useRef<HTMLInputElement>(null)
-  const reorderLevelRef = useRef<HTMLInputElement>(null)
+  // const reorderLevelRef = useRef<HTMLInputElement>(null)
   const addButtonRef = useRef<HTMLButtonElement>(null)
   const cancelButtonRef = useRef<HTMLButtonElement>(null)
 
@@ -168,7 +166,6 @@ export default function InventoryPage() {
           name: editValues.name,
           price: parseFloat(editValues.price as any),
           stock: parseInt(editValues.stock as any),
-          reorder_level: parseInt(editValues.reorder_level as any),
         }),
       })
 
@@ -182,7 +179,6 @@ export default function InventoryPage() {
                 name: editValues.name || p.name,
                 price: parseFloat(editValues.price as any) || p.price,
                 stock: parseInt(editValues.stock as any) || p.stock,
-                reorder_level: parseInt(editValues.reorder_level as any) || p.reorder_level,
               }
             : p
         )
@@ -222,7 +218,7 @@ export default function InventoryPage() {
     }
   }
   const handleAddProduct = async () => {
-    if (!newProduct.name || !newProduct.price || !newProduct.stock || !newProduct.reorder_level) {
+    if (!newProduct.name || !newProduct.price || !newProduct.stock) {
       alert('All fields are required')
       return
     }
@@ -235,7 +231,6 @@ export default function InventoryPage() {
           name: newProduct.name,
           price: parseFloat(newProduct.price),
           stock: parseInt(newProduct.stock),
-          reorder_level: parseInt(newProduct.reorder_level),
         }),
       })
 
@@ -243,7 +238,7 @@ export default function InventoryPage() {
 
       const product = await res.json()
       setProducts((prev) => [...prev, product])
-      setNewProduct({ name: '', price: '', stock: '', reorder_level: '50' })
+      setNewProduct({ name: '', price: '', stock: '' })
       setShowAddDialog(false)
     } catch (error) {
       console.error('[v0] Failed to add product:', error)
@@ -315,57 +310,7 @@ export default function InventoryPage() {
 
       <div className="p-3 md:p-6 max-w-7xl mx-auto">
         {/* Low Stock Alert Card */}
-        {products.filter(p => p.stock <= p.reorder_level).length > 0 && (
-          <Card className="p-4 sm:p-5 md:p-6 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-300 shadow-lg mb-4 sm:mb-6">
-            <div className="flex items-start gap-3 sm:gap-4 mb-4">
-              <div className="p-2 bg-red-100 rounded-lg">
-                <AlertTriangle size={24} className="text-red-600 sm:w-7 sm:h-7" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg sm:text-xl font-bold text-red-900 mb-1">Low Stock Alert</h3>
-                <p className="text-sm sm:text-base text-red-700">
-                  <span className="font-semibold">{products.filter(p => p.stock <= p.reorder_level).length}</span> product(s) need restocking
-                </p>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-              {products.filter(p => p.stock <= p.reorder_level).map(product => (
-                <div key={product.id} className="bg-white border-2 border-red-200 rounded-xl p-3 sm:p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-gray-900 text-sm sm:text-base truncate mb-1">{product.name}</h4>
-                      <p className="text-xs text-gray-500 font-mono">ID: {product.id}</p>
-                    </div>
-                    {product.stock === 0 && (
-                      <span className="ml-2 px-2 py-0.5 bg-red-600 text-white text-[10px] font-bold rounded uppercase whitespace-nowrap">
-                        Out
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <div className="flex-1 bg-red-50 border border-red-200 rounded-lg p-2">
-                      <p className="text-[10px] text-red-600 font-medium uppercase tracking-wide mb-0.5">Current Stock</p>
-                      <p className="text-lg font-bold text-red-700">{product.stock}</p>
-                    </div>
-                    <div className="flex-1 bg-orange-50 border border-orange-200 rounded-lg p-2">
-                      <p className="text-[10px] text-orange-600 font-medium uppercase tracking-wide mb-0.5">Reorder At</p>
-                      <p className="text-lg font-bold text-orange-700">{product.reorder_level}</p>
-                    </div>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="default"
-                    onClick={() => handleEdit(product)}
-                    className="w-full gap-1.5 h-9 bg-red-600 hover:bg-red-700 text-white font-medium"
-                  >
-                    <Edit2 size={14} />
-                    <span className="text-xs sm:text-sm">Restock Now</span>
-                  </Button>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
+        {/* Low Stock Alert Card removed (reorder level logic) */}
 
         {/* Category Cards */}
         {categoryCounts.length > 0 && (
@@ -453,7 +398,7 @@ export default function InventoryPage() {
                     <TableHead className="text-gray-800 font-bold text-xs sm:text-sm">Product Name</TableHead>
                     <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Price (Rs.)</TableHead>
                     <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Stock</TableHead>
-                    <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Reorder Level</TableHead>
+                    {/* <TableHead className="text-right text-gray-800 font-bold text-xs sm:text-sm">Reorder Level</TableHead> */}
                     <TableHead className="text-center text-gray-800 font-bold text-xs sm:text-sm">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -532,41 +477,7 @@ export default function InventoryPage() {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right text-gray-800">
-                        {editingId === product.id ? (
-                          <Input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={editValues.reorder_level || ''}
-                            onChange={(e) => {
-                              const value = e.target.value
-                              if (value === '' || parseFloat(value) >= 0) {
-                                setEditValues({
-                                  ...editValues,
-                                  reorder_level: value,
-                                })
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                                e.preventDefault()
-                              }
-                            }}
-                            className="w-24 text-right border-2 border-blue-500 bg-white text-gray-900"
-                          />
-                        ) : (
-                          <span
-                            className={
-                              product.stock <= product.reorder_level
-                                ? 'text-orange-600 font-bold'
-                                : ''
-                            }
-                          >
-                            {product.reorder_level}
-                          </span>
-                        )}
-                      </TableCell>
+                      {/* Reorder Level column removed */}
                       <TableCell>
                         <div className="flex justify-center gap-1 sm:gap-2 flex-wrap">
                           {editingId === product.id ? (
@@ -717,7 +628,7 @@ export default function InventoryPage() {
                   }
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    reorderLevelRef.current?.focus()
+                    // removed reorderLevelRef
                   }
                   if (e.shiftKey && e.key === 'ArrowUp') {
                     e.preventDefault()
@@ -726,8 +637,8 @@ export default function InventoryPage() {
                   }
                   if (e.shiftKey && e.key === 'ArrowDown') {
                     e.preventDefault()
-                    reorderLevelRef.current?.focus()
-                    reorderLevelRef.current?.select()
+                    // removed reorderLevelRef
+                    // removed reorderLevelRef
                   }
                 }}
                 placeholder="25"
@@ -735,41 +646,7 @@ export default function InventoryPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="reorder_level" className="text-gray-900 font-semibold">Reorder Level</Label>
-              <Input
-                ref={reorderLevelRef}
-                id="reorder_level"
-                type="number"
-                min="0"
-                step="1"
-                value={newProduct.reorder_level}
-                onChange={(e) =>
-                  setNewProduct({ ...newProduct, reorder_level: e.target.value })
-                }
-                onFocus={(e) => e.target.select()}
-                onKeyDown={(e) => {
-                  if (e.key === '-' || e.key === 'e' || e.key === 'E') {
-                    e.preventDefault()
-                  }
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    addButtonRef.current?.focus()
-                  }
-                  if (e.shiftKey && e.key === 'ArrowUp') {
-                    e.preventDefault()
-                    stockRef.current?.focus()
-                    stockRef.current?.select()
-                  }
-                  if (e.shiftKey && e.key === 'ArrowDown') {
-                    e.preventDefault()
-                    addButtonRef.current?.focus()
-                  }
-                }}
-                placeholder="50"
-                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
-              />
-            </div>
+            {/* Reorder Level input removed */}
 
             <div className="flex gap-3 pt-4">
               <Button
@@ -792,8 +669,8 @@ export default function InventoryPage() {
                 onKeyDown={(e) => {
                   if (e.shiftKey && e.key === 'ArrowUp') {
                     e.preventDefault()
-                    reorderLevelRef.current?.focus()
-                    reorderLevelRef.current?.select()
+                    // removed reorderLevelRef
+                    // removed reorderLevelRef
                   }
                   if (e.shiftKey && e.key === 'ArrowDown') {
                     e.preventDefault()
