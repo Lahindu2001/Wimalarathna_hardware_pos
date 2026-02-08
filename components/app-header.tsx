@@ -113,10 +113,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <Home size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">Home</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+1
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">Home <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+1</span></span>
               </Button>
 
               <Button
@@ -126,10 +123,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <HelpCircle size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">Help</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+H
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">Help <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+H</span></span>
               </Button>
 
               <Button
@@ -141,10 +135,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <Users size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">Admin</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+2
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">Admin <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+2</span></span>
               </Button>
 
               <Button
@@ -156,10 +147,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <Package size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">Inventory</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+3
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">Inventory <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+3</span></span>
               </Button>
 
               <Button
@@ -171,10 +159,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <BarChart3 size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">History</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+4
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">History <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+4</span></span>
               </Button>
 
               <Button
@@ -184,10 +169,7 @@ export function AppHeader() {
                 size="sm"
               >
                 <LogOut size={16} className="sm:w-[18px] sm:h-[18px]" />
-                <span className="hidden md:inline text-xs sm:text-sm">Logout</span>
-                <span className="hidden xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono">
-                  Alt+5
-                </span>
+                  <span className="hidden md:inline text-xs sm:text-sm">Logout <span className="inline xl:inline text-xs px-1.5 py-0.5 bg-white/20 rounded font-mono ml-1">Alt+5</span></span>
               </Button>
             </div>
           </div>

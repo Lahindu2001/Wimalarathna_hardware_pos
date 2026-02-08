@@ -169,8 +169,30 @@ export function POSProducts({
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-blue-800">
-        <h2 className="text-base sm:text-lg md:text-xl font-bold text-white">Add Products</h2>
-        <p className="text-blue-100 text-xs sm:text-sm mt-1">Search and select items to add to cart</p>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          <div>
+            <h2 className="text-base sm:text-lg md:text-xl font-bold text-white">Add Products</h2>
+            <p className="text-blue-100 text-xs sm:text-sm mt-1">Search and select items to add to cart</p>
+          </div>
+          {/* Keyboard Shortcuts in Header */}
+          <div className="bg-blue-800/20 rounded-lg p-2 sm:p-3 border border-blue-700/30">
+            <h3 className="text-[10px] sm:text-xs font-bold text-blue-100 uppercase mb-1">Shortcuts</h3>
+            <div className="flex flex-wrap gap-1 sm:gap-2 text-[9px] sm:text-[10px] text-blue-100">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1 py-0.5 bg-blue-700/50 border border-blue-600 rounded text-[9px] sm:text-[10px] font-mono">F9</kbd>
+                <span>Checkout</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1 py-0.5 bg-blue-700/50 border border-blue-600 rounded text-[9px] sm:text-[10px] font-mono">Esc</kbd>
+                <span>Clear</span>
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="px-1 py-0.5 bg-blue-700/50 border border-blue-600 rounded text-[9px] sm:text-[10px] font-mono">Tab</kbd>
+                <span>Next</span>
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5">
@@ -281,60 +303,62 @@ export function POSProducts({
         {/* Quantity and Price Inputs */}
         {selectedProduct && (
           <>
-            <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
-                Quantity
-              </label>
-              <Input
-                ref={qtyRef}
-                type="number"
-                min="1"
-                max={selectedProduct.stock}
-                value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
-                onKeyDown={handleKeyDownOnQty}
-                onFocus={(e) => e.target.select()}
-                className="h-12 sm:h-14 text-base sm:text-lg font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 shadow-sm"
-                tabIndex={2}
-              />
-            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                  Quantity
+                </label>
+                <Input
+                  ref={qtyRef}
+                  type="number"
+                  min="1"
+                  max={selectedProduct.stock}
+                  value={quantity}
+                  onChange={(e) => setQuantity(e.target.value)}
+                  onKeyDown={handleKeyDownOnQty}
+                  onFocus={(e) => e.target.select()}
+                  className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
+                  tabIndex={2}
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
-                Price (Rs.) <span className="text-xs text-blue-600">(Editable)</span>
-              </label>
-              <Input
-                ref={priceRef}
-                type="number"
-                step="0.01"
-                min="0"
-                value={customPrice}
-                onChange={(e) => setCustomPrice(e.target.value)}
-                onKeyDown={handleKeyDownOnPrice}
-                className="h-12 sm:h-14 text-base sm:text-lg font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 shadow-sm"
-                tabIndex={3}
-              />
-            </div>
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                  Price (Rs.) <span className="text-xs text-blue-600">(Editable)</span>
+                </label>
+                <Input
+                  ref={priceRef}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={customPrice}
+                  onChange={(e) => setCustomPrice(e.target.value)}
+                  onKeyDown={handleKeyDownOnPrice}
+                  className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
+                  tabIndex={3}
+                />
+              </div>
 
-            <div>
-              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
-                Discount (%) <span className="text-xs text-blue-600">(0-100)</span>
-              </label>
-              <Input
-                ref={discountRef}
-                type="number"
-                min="0"
-                max="100"
-                value={discount}
-                onChange={(e) => setDiscount(e.target.value)}
-                onKeyDown={handleKeyDownOnDiscount}
-                className="h-12 sm:h-14 text-base sm:text-lg font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 shadow-sm"
-                tabIndex={4}
-              />
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1">
+                  Discount (%) <span className="text-xs text-blue-600">(0-100)</span>
+                </label>
+                <Input
+                  ref={discountRef}
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={discount}
+                  onChange={(e) => setDiscount(e.target.value)}
+                  onKeyDown={handleKeyDownOnDiscount}
+                  className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
+                  tabIndex={4}
+                />
+              </div>
             </div>
 
             {/* Show discounted price summary */}
-            <div className="mt-2 mb-4 text-sm sm:text-base font-semibold text-blue-700">
+            <div className="text-sm sm:text-base font-semibold text-blue-700 text-center">
               Discounted Price: Rs. {(() => {
                 const price = parseFloat(customPrice) || selectedProduct.price;
                 const disc = parseFloat(discount) || 0;
@@ -345,7 +369,7 @@ export function POSProducts({
             <Button
               onClick={handleAddToCart}
               disabled={!selectedProduct || loading || parseInt(quantity) <= 0 || parseInt(quantity) > selectedProduct.stock || parseFloat(discount) < 0 || parseFloat(discount) > 100}
-              className="w-full h-12 sm:h-14 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm sm:text-base font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full h-10 sm:h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm sm:text-base font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               tabIndex={5}
             >
               <Plus size={18} className="mr-1.5 sm:mr-2 sm:w-[22px] sm:h-[22px]" />
@@ -353,20 +377,6 @@ export function POSProducts({
             </Button>
           </>
         )}
-
-        {/* Keyboard Shortcuts Info */}
-        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-slate-200">
-          <div className="bg-slate-50 rounded-lg p-3 sm:p-4 border border-slate-200">
-            <h3 className="text-[10px] sm:text-xs font-bold text-slate-600 uppercase mb-2">Keyboard Shortcuts</h3>
-            <div className="space-y-1 text-[10px] sm:text-xs text-slate-600">
-              <p><kbd className="px-1.5 sm:px-2 py-0.5 bg-white border border-slate-300 rounded text-[10px] sm:text-xs font-mono">F9</kbd> Checkout</p>
-              <p><kbd className="px-1.5 sm:px-2 py-0.5 bg-white border border-slate-300 rounded text-[10px] sm:text-xs font-mono">Esc</kbd> Clear cart</p>
-              <p><kbd className="px-1.5 sm:px-2 py-0.5 bg-white border border-slate-300 rounded text-[10px] sm:text-xs font-mono">Tab</kbd> Next field</p>
-              <p><kbd className="px-1.5 sm:px-2 py-0.5 bg-white border border-slate-300 rounded text-[10px] sm:text-xs font-mono">Shift+↑↓</kbd> Qty/Price</p>
-              <p><kbd className="px-1.5 sm:px-2 py-0.5 bg-white border border-slate-300 rounded text-[10px] sm:text-xs font-mono">↑↓</kbd> Navigate results</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )
