@@ -37,7 +37,7 @@ export default function InventoryPage() {
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editValues, setEditValues] = useState<EditingProduct>({})
   const [showAddDialog, setShowAddDialog] = useState(false)
-  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '' })
+  const [newProduct, setNewProduct] = useState({ name: '', price: '', stock: '', discount: '0' })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchRef = useRef<HTMLInputElement>(null)
@@ -223,14 +223,20 @@ export default function InventoryPage() {
       return
     }
 
+    // Calculate discounted price
+    const price = parseFloat(newProduct.price)
+    const discount = Math.max(0, Math.min(100, parseFloat(newProduct.discount || '0')))
+    const discountedPrice = price * (1 - discount / 100)
+
     try {
       const res = await fetch('/api/inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newProduct.name,
-          price: parseFloat(newProduct.price),
+          price: discountedPrice,
           stock: 9999,
+          discount,
         }),
       })
 
@@ -238,7 +244,7 @@ export default function InventoryPage() {
 
       const product = await res.json()
       setProducts((prev) => [...prev, product])
-      setNewProduct({ name: '', price: '', stock: '' })
+      setNewProduct({ name: '', price: '', stock: '', discount: '0' })
       setShowAddDialog(false)
     } catch (error) {
       console.error('[v0] Failed to add product:', error)
@@ -610,6 +616,35 @@ export default function InventoryPage() {
                 placeholder="450.00"
                 className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="discount" className="text-gray-900 font-semibold">Discount (%)</Label>
+              <Input
+                id="discount"
+                type="number"
+                min="0"
+                max="100"
+                value={newProduct.discount}
+                onChange={(e) => {
+                  let val = e.target.value
+                  if (val === '') val = '0'
+                  setNewProduct({ ...newProduct, discount: val })
+                }}
+                onFocus={(e) => e.target.select()}
+                placeholder="0"
+                className="h-11 border-2 border-gray-300 focus:border-blue-600 bg-white text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label className="text-gray-900 font-semibold">Discounted Price</Label>
+              <div className="h-11 flex items-center border-2 border-gray-300 bg-gray-50 text-gray-900 px-3 font-bold">
+                {(() => {
+                  const price = parseFloat(newProduct.price || '0')
+                  const discount = Math.max(0, Math.min(100, parseFloat(newProduct.discount || '0')))
+                  const discountedPrice = price * (1 - discount / 100)
+                  return discountedPrice.toFixed(2)
+                })()}
+              </div>
             </div>
 
             {/* Stock input hidden, stock always defaults to 9999 */}

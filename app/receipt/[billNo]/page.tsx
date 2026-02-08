@@ -16,6 +16,7 @@ interface ReceiptData {
     price: number
     quantity: number
     total: number
+    discount?: number
   }[]
   totalAmount: number
   amountPaid?: number
@@ -384,26 +385,30 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
               <div className="flex">
                 <span className="flex-1">Item</span>
                 <span style={{ width: '35px', textAlign: 'center' }}>Qty</span>
-                <span style={{ width: '50px', textAlign: 'right' }}>Price</span>
+                <span style={{ width: '50px', textAlign: 'right' }}>U.Price</span>
+                <span style={{ width: '60px', textAlign: 'right' }}>Dis %</span>
                 <span style={{ width: '60px', textAlign: 'right' }}>Total</span>
               </div>
             </div>
 
             <div style={{ fontSize: '12px' }}>
-              {receipt.items.map((item, index) => (
-                <div key={item.id} style={{ marginBottom: '4px' }}>
-                  <div className="flex items-start">
-                    <span className="flex-1 font-semibold">{item.name}</span>
-                    <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
-                    <span style={{ width: '50px', textAlign: 'right' }}>
-                      {formatCurrency(Number(item.price))}
-                    </span>
-                    <span style={{ width: '60px', textAlign: 'right', fontWeight: 'bold' }}>
-                      {formatCurrency(Number(item.total))}
-                    </span>
+              {receipt.items.map((item, index) => {
+                const discountPercent = item.discount ?? 0;
+                const discountRs = item.price * item.quantity * discountPercent / 100;
+                const discountedPrice = item.price * (1 - discountPercent / 100);
+                const totalWithDiscount = discountedPrice * item.quantity;
+                return (
+                  <div key={item.id} style={{ marginBottom: '4px' }}>
+                    <div className="flex items-start">
+                      <span className="flex-1 font-semibold">{item.name}</span>
+                      <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
+                      <span style={{ width: '50px', textAlign: 'right' }}>{formatCurrency(Number(item.price))}</span>
+                      <span style={{ width: '60px', textAlign: 'right', color: discountRs > 0 ? '#d00' : '#111827', fontWeight: discountRs > 0 ? 'bold' : 'normal' }}>{discountRs > 0 ? formatCurrency(discountRs) : '-'}</span>
+                      <span style={{ width: '60px', textAlign: 'right', color: discountPercent > 0 ? '#0a0' : '#111827', fontWeight: discountPercent > 0 ? 'bold' : 'normal' }}>{formatCurrency(totalWithDiscount)}</span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -415,10 +420,20 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                 {receipt.items.reduce((sum, item) => sum + item.quantity, 0)}
               </span>
             </div>
-            <div className="flex justify-between" style={{ alignItems: 'center', margin: '8px 0' }}>
-              <span className="font-bold" style={{ fontSize: '15px' }}>Total Amount:</span>
-              <span className="font-bold" style={{ fontSize: '22px', color: '#111827', letterSpacing: '1px' }}>Rs. {formatCurrency(Number(receipt.totalAmount))}</span>
-            </div>
+            {/* Calculate discounted total */}
+            {(() => {
+              const discountedTotal = receipt.items.reduce((sum, item) => {
+                const discount = item.discount ?? 0;
+                const discountedPrice = item.price * (1 - discount / 100);
+                return sum + discountedPrice * item.quantity;
+              }, 0);
+              return (
+                <div className="flex justify-between" style={{ alignItems: 'center', margin: '8px 0' }}>
+                  <span className="font-bold" style={{ fontSize: '15px' }}>Total Amount:</span>
+                  <span className="font-bold" style={{ fontSize: '22px', color: '#111827', letterSpacing: '1px' }}>Rs. {formatCurrency(discountedTotal)}</span>
+                </div>
+              );
+            })()}
             {(receipt.enableReturnBalance && receipt.customerReturnBalance !== undefined) ? (
               <>
                 <div className="flex justify-between" style={{ marginTop: '4px' }}>
@@ -426,7 +441,12 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   <span className="font-bold">Rs. {formatCurrency(Number(receipt.customerReturnBalance))}</span>
                 </div>
                 {(() => {
-                  const change = Number(receipt.customerReturnBalance) - Number(receipt.totalAmount);
+                  const discountedTotal = receipt.items.reduce((sum, item) => {
+                    const discount = item.discount ?? 0;
+                    const discountedPrice = item.price * (1 - discount / 100);
+                    return sum + discountedPrice * item.quantity;
+                  }, 0);
+                  const change = Number(receipt.customerReturnBalance) - discountedTotal;
                   if (!isNaN(change) && change !== 0) {
                     return (
                       <div className="flex justify-between">
@@ -449,7 +469,12 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   <span className="font-bold">Rs. {formatCurrency(Number(receipt.amountPaid))}</span>
                 </div>
                 {(() => {
-                  const change = Number(receipt.amountPaid) - Number(receipt.totalAmount);
+                  const discountedTotal = receipt.items.reduce((sum, item) => {
+                    const discount = item.discount ?? 0;
+                    const discountedPrice = item.price * (1 - discount / 100);
+                    return sum + discountedPrice * item.quantity;
+                  }, 0);
+                  const change = Number(receipt.amountPaid) - discountedTotal;
                   if (!isNaN(change) && change !== 0) {
                     return (
                       <div className="flex justify-between">

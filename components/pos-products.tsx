@@ -10,6 +10,7 @@ interface Product {
   name: string
   price: number
   stock: number
+  discount?: number // Discount percentage (0-100)
 }
 
 interface POSProductsProps {
@@ -29,10 +30,12 @@ export function POSProducts({
   const [quantity, setQuantity] = useState<string>('1')
   const [customPrice, setCustomPrice] = useState<string>('')
   const [showResults, setShowResults] = useState(false)
+  const [discount, setDiscount] = useState<string>('0')
   
   const searchRef = useRef<HTMLInputElement>(null)
   const qtyRef = useRef<HTMLInputElement>(null)
   const priceRef = useRef<HTMLInputElement>(null)
+  const discountRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -93,6 +96,7 @@ export function POSProducts({
     setSelectedProduct(product)
     setCustomPrice(product.price.toString())
     setQuantity('1')
+    setDiscount('0')
     setShowResults(false)
     setSearchQuery('')
     setTimeout(() => {
@@ -105,18 +109,16 @@ export function POSProducts({
     if (selectedProduct) {
       const qty = parseInt(quantity) || 1
       const price = parseFloat(customPrice) || selectedProduct.price
-      
-      if (qty > 0 && price > 0 && qty <= selectedProduct.stock) {
-        const productWithCustomPrice = { ...selectedProduct, price }
-        
+      const disc = parseFloat(discount) || 0
+      if (qty > 0 && price > 0 && qty <= selectedProduct.stock && disc >= 0 && disc <= 100) {
+        const productWithCustomPrice = { ...selectedProduct, price, discount: disc }
         for (let i = 0; i < qty; i++) {
           onAddToCart(productWithCustomPrice)
         }
-        
         setSelectedProduct(null)
         setQuantity('1')
         setCustomPrice('')
-        
+        setDiscount('0')
         searchRef.current?.focus()
       }
     }
@@ -125,13 +127,27 @@ export function POSProducts({
   const handleKeyDownOnPrice = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault()
-      handleAddToCart()
+      discountRef.current?.focus()
+      discountRef.current?.select()
     }
     // Shift + Up Arrow to go back to quantity
     if (e.shiftKey && e.key === 'ArrowUp') {
       e.preventDefault()
       qtyRef.current?.focus()
       qtyRef.current?.select()
+    }
+  }
+
+  const handleKeyDownOnDiscount = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault()
+      handleAddToCart()
+    }
+    // Shift + Up Arrow to go back to price
+    if (e.shiftKey && e.key === 'ArrowUp') {
+      e.preventDefault()
+      priceRef.current?.focus()
+      priceRef.current?.select()
     }
   }
 
@@ -300,11 +316,37 @@ export function POSProducts({
               />
             </div>
 
+            <div>
+              <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-2">
+                Discount (%) <span className="text-xs text-blue-600">(0-100)</span>
+              </label>
+              <Input
+                ref={discountRef}
+                type="number"
+                min="0"
+                max="100"
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                onKeyDown={handleKeyDownOnDiscount}
+                className="h-12 sm:h-14 text-base sm:text-lg font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 shadow-sm"
+                tabIndex={4}
+              />
+            </div>
+
+            {/* Show discounted price summary */}
+            <div className="mt-2 mb-4 text-sm sm:text-base font-semibold text-blue-700">
+              Discounted Price: Rs. {(() => {
+                const price = parseFloat(customPrice) || selectedProduct.price;
+                const disc = parseFloat(discount) || 0;
+                return (price * (1 - disc / 100)).toFixed(2);
+              })()}
+            </div>
+
             <Button
               onClick={handleAddToCart}
-              disabled={!selectedProduct || loading || parseInt(quantity) <= 0 || parseInt(quantity) > selectedProduct.stock}
+              disabled={!selectedProduct || loading || parseInt(quantity) <= 0 || parseInt(quantity) > selectedProduct.stock || parseFloat(discount) < 0 || parseFloat(discount) > 100}
               className="w-full h-12 sm:h-14 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm sm:text-base font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-              tabIndex={4}
+              tabIndex={5}
             >
               <Plus size={18} className="mr-1.5 sm:mr-2 sm:w-[22px] sm:h-[22px]" />
               Add to Cart

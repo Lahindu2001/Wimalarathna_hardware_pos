@@ -53,6 +53,7 @@ export async function createBill(
   customerName: string,
   items: any[],
   totalAmount: number,
+  billDiscount: number,
   amountPaid?: number,
   changeReturned?: number,
   customerReturnBalance?: number,
@@ -61,12 +62,13 @@ export async function createBill(
   // Get current date and time in local timezone
   const currentTime = new Date()
   const result = await query(
-    'INSERT INTO bill_history (bill_no, customer_name, items, total_amount, amount_paid, change_returned, customer_return_balance, enable_return_balance, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+    'INSERT INTO bill_history (bill_no, customer_name, items, total_amount, bill_discount, amount_paid, change_returned, customer_return_balance, enable_return_balance, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
     [
       billNo,
       customerName,
       JSON.stringify(items),
       totalAmount,
+      billDiscount,
       amountPaid || null,
       changeReturned || null,
       customerReturnBalance || 0,

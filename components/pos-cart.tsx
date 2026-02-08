@@ -14,6 +14,7 @@ interface CartItem {
   name: string
   price: number
   quantity: number
+  discount?: number // Discount percentage (0-100)
 }
 
 interface POSCartProps {
@@ -47,7 +48,15 @@ export function POSCart({
   const [customerReturnBalance, setCustomerReturnBalance] = useState('0')
   const [enableReturnBalance, setEnableReturnBalance] = useState(false)
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Subtotal before discount
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  // Total discount amount
+  const totalDiscount = items.reduce((sum, item) => {
+    const discount = item.discount ?? 0;
+    return sum + (item.price * item.quantity * discount / 100);
+  }, 0)
+  // Final total after discount
+  const total = subtotal - totalDiscount
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
   const productCount = items.length
 
@@ -196,126 +205,164 @@ export function POSCart({
           {/* Scrollable Receipt Items */}
           <div className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3">
             <div className="space-y-1.5 sm:space-y-2">
-              {items.map((item, index) => (
-                <div
-                  key={item.id}
-                  className="border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0"
-                >
-                  {/* Item Name Row */}
-                  <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
-                    <div className="flex-1 flex items-center gap-1 sm:gap-1.5">
-                      <span className="text-[10px] sm:text-xs font-bold text-slate-600">{index + 1}.</span>
-                      <p className="font-semibold text-slate-800 text-xs sm:text-sm leading-tight">
-                        {item.name}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => onRemove(item.id)}
-                      className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded flex-shrink-0"
-                      disabled={loading}
-                      title="Remove"
-                    >
-                      <X size={12} className="sm:w-[14px] sm:h-[14px]" />
-                    </button>
-                  </div>
-                  
-                  {/* Bill Line: Qty × Price = Total */}
-                  <div className="flex items-center justify-between text-xs pl-5">
-                    <div className="flex items-center gap-2">
-                      {/* Quantity with small controls */}
-                      <div className="flex items-center gap-0.5">
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                          className="w-4 h-4 bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
-                          disabled={loading}
-                          tabIndex={-1}
-                        >
-                          −
-                        </button>
-                        <Input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) => {
-                            const qty = parseInt(e.target.value)
-                            if (!isNaN(qty) && qty > 0) {
-                              onUpdateQuantity(item.id, qty)
-                            }
-                          }}
-                          onFocus={(e) => e.target.select()}
-                          className="w-8 text-center font-mono font-bold text-xs h-4 border border-slate-300 focus:border-blue-500 bg-white rounded px-0"
-                          tabIndex={4}
-                        />
-                        <button
-                          onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                          className="w-4 h-4 bg-slate-200 hover:bg-green-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
-                          disabled={loading}
-                          tabIndex={-1}
-                        >
-                          +
-                        </button>
+              {items.map((item, index) => {
+                const discount = item.discount ?? 0;
+                const discountedPrice = item.price * (1 - discount / 100);
+                return (
+                  <div
+                    key={item.id}
+                    className="border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0"
+                  >
+                    {/* Item Name Row */}
+                    <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
+                      <div className="flex-1 flex items-center gap-1 sm:gap-1.5">
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-600">{index + 1}.</span>
+                        <p className="font-semibold text-slate-800 text-xs sm:text-sm leading-tight">
+                          {item.name}
+                        </p>
                       </div>
-                      
-                      <span className="text-slate-500">×</span>
-                      
-                      {/* Price (editable) */}
-                      {editingPrice === item.id ? (
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={priceValue}
-                          onChange={(e) => setPriceValue(e.target.value)}
-                          onBlur={() => handlePriceSave(item.id)}
-                          onFocus={(e) => e.target.select()}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') handlePriceSave(item.id)
-                            if (e.key === 'Escape') {
-                              setEditingPrice(null)
-                              setPriceValue('')
-                            }
-                          }}
-                          className="w-20 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
-                          tabIndex={3}
-                          autoFocus
-                        />
-                      ) : (
-                        <button
-                          onClick={() => handlePriceEdit(item)}
-                          className="text-blue-600 hover:underline font-mono"
-                        >
-                          {formatCurrency(Number(item.price))}
-                        </button>
-                      )}
+                      <button
+                        onClick={() => onRemove(item.id)}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-0.5 rounded flex-shrink-0"
+                        disabled={loading}
+                        title="Remove"
+                      >
+                        <X size={12} className="sm:w-[14px] sm:h-[14px]" />
+                      </button>
                     </div>
-                    
-                    {/* Line Total */}
-                    <span className="font-mono font-bold text-slate-800">
-                      {formatCurrency(Number(item.price) * item.quantity)}
-                    </span>
+                    {/* Bill Line: Qty × Price × Discount = Total */}
+                    <div className="flex items-center justify-between text-xs pl-5">
+                      <div className="flex items-center gap-2">
+                        {/* Quantity with small controls */}
+                        <div className="flex items-center gap-0.5">
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                            className="w-4 h-4 bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                            disabled={loading}
+                            tabIndex={-1}
+                          >
+                            −
+                          </button>
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => {
+                              const qty = parseInt(e.target.value)
+                              if (!isNaN(qty) && qty > 0) {
+                                onUpdateQuantity(item.id, qty)
+                              }
+                            }}
+                            onFocus={(e) => e.target.select()}
+                            className="w-8 text-center font-mono font-bold text-xs h-4 border border-slate-300 focus:border-blue-500 bg-white rounded px-0"
+                            tabIndex={4}
+                          />
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            className="w-4 h-4 bg-slate-200 hover:bg-green-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                            disabled={loading}
+                            tabIndex={-1}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-slate-500">×</span>
+                        {/* Price (editable) */}
+                        {editingPrice === item.id ? (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={priceValue}
+                            onChange={(e) => setPriceValue(e.target.value)}
+                            onBlur={() => handlePriceSave(item.id)}
+                            onFocus={(e) => e.target.select()}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') handlePriceSave(item.id)
+                              if (e.key === 'Escape') {
+                                setEditingPrice(null)
+                                setPriceValue('')
+                              }
+                            }}
+                            className="w-20 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
+                            tabIndex={3}
+                            autoFocus
+                          />
+                        ) : (
+                          <button
+                            onClick={() => handlePriceEdit(item)}
+                            className="text-blue-600 hover:underline font-mono"
+                          >
+                            {formatCurrency(Number(item.price))}
+                          </button>
+                        )}
+                        <span className="text-slate-500">×</span>
+                        {/* Discount (editable, with controls) */}
+                        <div className="flex items-center gap-0.5 ml-2">
+                          <button
+                            onClick={() => {
+                              if (onUpdatePrice) {
+                                const newDiscount = Math.max(0, Math.min(100, discount - 1));
+                                onUpdatePrice(item.id, item.price, newDiscount);
+                              }
+                            }}
+                            className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                            disabled={loading || discount <= 0}
+                            tabIndex={-1}
+                          >
+                            −
+                          </button>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={discount}
+                            onChange={(e) => {
+                              const val = parseFloat(e.target.value);
+                              if (!isNaN(val) && val >= 0 && val <= 100) {
+                                if (onUpdatePrice) {
+                                  onUpdatePrice(item.id, item.price, val);
+                                }
+                              }
+                            }}
+                            className="w-12 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
+                            tabIndex={5}
+                          />
+                          <button
+                            onClick={() => {
+                              if (onUpdatePrice) {
+                                const newDiscount = Math.max(0, Math.min(100, discount + 1));
+                                onUpdatePrice(item.id, item.price, newDiscount);
+                              }
+                            }}
+                            className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
+                            disabled={loading || discount >= 100}
+                            tabIndex={-1}
+                          >
+                            +
+                          </button>
+                          <span className="text-slate-500">% off</span>
+                        </div>
+                      </div>
+                      {/* Line Total (discounted) */}
+                      <span className="font-mono font-bold text-slate-800">
+                        {formatCurrency(discountedPrice * item.quantity)}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
           {/* Fixed Receipt Footer - Total & Checkout */}
           <div className="border-t-2 border-slate-300 bg-slate-50 px-2 sm:px-3 md:px-4 py-2 sm:py-3 flex-shrink-0">
-            {/* Receipt Total Lines */}
-            <div className="space-y-0.5 sm:space-y-1 mb-2 sm:mb-3 font-mono text-[11px] sm:text-xs md:text-sm">
-              <div className="flex justify-between text-slate-600">
-                <span>Subtotal:</span>
-                <span>Rs. {formatCurrency(total)}</span>
-              </div>
-              <div className="flex justify-between text-slate-600">
-                <span>Tax:</span>
-                <span>Rs. 0.00</span>
-              </div>
-              <div className="border-t-2 border-dashed border-slate-400 pt-1.5 sm:pt-2 flex justify-between font-bold text-sm sm:text-base text-slate-900">
+            {/* Receipt Total Line Only */}
+            <div className="mb-2 sm:mb-3 font-mono text-[13px] sm:text-base md:text-lg">
+              <div className="border-t-2 border-dashed border-slate-400 pt-2 flex justify-between font-bold text-base sm:text-lg text-slate-900">
                 <span>TOTAL:</span>
                 <span>Rs. {formatCurrency(total)}</span>
               </div>
             </div>
-            
             {/* Compact Checkout Button */}
             <Button
               onClick={handleCheckout}

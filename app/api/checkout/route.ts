@@ -44,8 +44,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Validate stock and calculate total
-    let totalAmount = 0
+    // Validate stock and calculate totals
+    let subtotal = 0
+    let totalDiscount = 0
     const billItems = []
 
     for (const item of items) {
@@ -65,8 +66,11 @@ export async function POST(request: NextRequest) {
         )
       }
 
+      const discount = item.discount ?? 0
       const itemTotal = item.price * item.quantity
-      totalAmount += itemTotal
+      const itemDiscount = item.price * item.quantity * discount / 100
+      subtotal += itemTotal
+      totalDiscount += itemDiscount
 
       billItems.push({
         id: product.id,
@@ -74,11 +78,14 @@ export async function POST(request: NextRequest) {
         price: item.price, // use cart price
         quantity: item.quantity,
         total: itemTotal,
+        discount: discount,
       })
 
       // Update stock
       await updateProductStock(product.id, product.stock - item.quantity)
     }
+
+    const totalAmount = subtotal - totalDiscount
 
     // Create bill
     const billNo = await generateBillNo()
@@ -87,6 +94,7 @@ export async function POST(request: NextRequest) {
       customerName || 'Walk-in', 
       billItems, 
       totalAmount,
+      totalDiscount,
       amountPaid || totalAmount,
       changeReturned !== undefined ? changeReturned : 0,
       customerReturnBalance !== undefined ? customerReturnBalance : 0,
@@ -98,6 +106,7 @@ export async function POST(request: NextRequest) {
       customerName: bill.customer_name,
       items: billItems,
       totalAmount,
+      billDiscount: bill.bill_discount,
       amountPaid: bill.amount_paid,
       changeReturned: bill.change_returned,
       customerReturnBalance: bill.customer_return_balance,
