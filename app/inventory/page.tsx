@@ -238,7 +238,7 @@ export default function InventoryPage() {
 
       const product = await res.json()
       setProducts((prev) => [...prev, product])
-      setNewProduct({ name: '', price: '' })
+      setNewProduct({ name: '', price: '', stock: '' })
       setShowAddDialog(false)
     } catch (error) {
       console.error('[v0] Failed to add product:', error)
