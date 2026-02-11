@@ -89,21 +89,83 @@ export function AppHeader() {
   return (
     <>
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg">
-        <div className="px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4">
-          <div className="flex items-center justify-between gap-2 md:gap-4">
+        <div
+          className="px-1 py-1"
+          style={{
+            minWidth: 0,
+            minHeight: 0,
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
+          <div
+            className="flex flex-row flex-wrap items-center justify-between gap-1"
+            style={{
+              rowGap: '0.25rem',
+              columnGap: '0.5vw',
+              width: '100%',
+            }}
+          >
             {/* Company Info */}
-            <div className="min-w-0 flex-shrink">
-              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-bold truncate">Wimalarathna Hardware</h1>
-              <p className="text-[10px] sm:text-xs md:text-sm text-blue-100 hidden sm:block">
+            <div className="min-w-0 flex-shrink text-left" style={{maxWidth: '60vw'}}>
+              <h1
+                className="font-bold truncate"
+                style={{
+                  fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
+                  lineHeight: 1.1,
+                  marginBottom: 2,
+                }}
+              >
+                Wimalarathna Hardware
+              </h1>
+              <p
+                className="text-blue-100"
+                style={{
+                  fontSize: 'clamp(0.65rem, 1vw, 0.85rem)',
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+              >
                 Hospital Opposite, Dompe | Phone: 0112409682
               </p>
-              <p className="text-[10px] sm:text-xs md:text-sm text-blue-200 font-medium mt-0.5 sm:mt-1">
+              <p
+                className="text-blue-200 font-medium mt-0.5"
+                style={{
+                  fontSize: 'clamp(0.65rem, 1vw, 0.85rem)',
+                  lineHeight: 1.1,
+                  margin: 0,
+                }}
+              >
                 {currentDateTime}
               </p>
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <div
+              className="flex flex-wrap items-center justify-end gap-1 sm:gap-2 flex-shrink-0"
+              style={{rowGap: '0.15rem', columnGap: '0.3vw', flex: 1}}
+            >
+                    {/* Extra responsive tweaks for 1024x768 screens */}
+                    <style>{`
+                      @media (max-width: 1100px) and (min-width: 1024px) {
+                        header .font-bold {
+                          font-size: 1rem !important;
+                        }
+                        header p {
+                          font-size: 0.8rem !important;
+                        }
+                        header .flex-wrap {
+                          flex-wrap: wrap !important;
+                        }
+                        header .gap-1, header .gap-2 {
+                          gap: 0.2rem !important;
+                        }
+                        header .px-2, header .px-4, header .md\:px-6 {
+                          padding-left: 0.5rem !important;
+                          padding-right: 0.5rem !important;
+                        }
+                      }
+                    `}</style>
               <Button
                 variant="ghost"
                 onClick={() => router.push('/pos')}

@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-:root {
+ :root {
   --background: 249 250 251; /* gray-50 #f9fafb */
   --foreground: 17 24 39; /* gray-900 #111827 */
   --card: 255 255 255; /* white */
@@ -121,5 +121,58 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Responsive fix for 1024x768 screens (treat as laptop, but more compact) */
+@media (min-width: 1024px) and (max-width: 1100px) and (min-height: 700px) and (max-height: 800px) {
+  html {
+    font-size: 15px;
+  }
+  body {
+    background: #f5f6fa;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: auto;
+  }
+  .max-w-7xl, .max-w-screen-lg, .max-w-screen-xl {
+    max-width: 98vw !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .lg\:flex-row {
+    flex-direction: row !important;
+  }
+  .lg\:order-1, .lg\:order-2 {
+    order: initial !important;
+  }
+  .lg\:w-\[380px\], .lg\:w-\[420px\] {
+    width: 320px !important;
+  }
+  .lg\:max-h-none {
+    max-height: none !important;
+  }
+  .p-6 {
+    padding: 1rem !important;
+  }
+  .px-3, .md\:px-6 {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+  .py-3 {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  .text-lg {
+    font-size: 1.05rem !important;
+  }
+  .text-xl {
+    font-size: 1.15rem !important;
+  }
+  .text-2xl {
+    font-size: 1.25rem !important;
+  }
+  .text-3xl {
+    font-size: 1.35rem !important;
   }
 }
