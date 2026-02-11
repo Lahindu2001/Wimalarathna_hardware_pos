@@ -496,7 +496,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           {/* Footer */}
           <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
             <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
-            <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>Powered by HelaCode | Tel: 074 202 2080 </p>
+            <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>Powered by HelaCode | Tel: 074 2420 404 </p>
             <p style={{ fontSize: '10px', fontWeight: '500', margin: '2px 0' }}>www.helacode.com</p>
             <div className="cut-line" style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
