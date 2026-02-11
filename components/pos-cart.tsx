@@ -220,13 +220,11 @@ export function POSCart({
         <>
           {/* Scrollable Receipt Items */}
           <div
-            className="overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3 mb-6 lg:flex-1"
+            className="overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3 mb-6 lg:flex-1 custom-scrollbar"
             style={{
               height: '28vh',
               minHeight: 180,
               maxHeight: 320,
-              /* On laptop and up, use 100% height of parent (flex-1) */
-              /* This will be overridden by flex-1 on lg screens via Tailwind */
             }}
           >
             <div className="space-y-1.5 sm:space-y-2">

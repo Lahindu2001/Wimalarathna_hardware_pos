@@ -1,3 +1,32 @@
+/* Make all scrollbars wider for better usability */
+html, body, * {
+  scrollbar-width: thick;
+}
+::-webkit-scrollbar {
+  width: 28px;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+/* Wide custom scrollbar for touch usability */
+.custom-scrollbar {
+  scrollbar-width: thick;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 18px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
