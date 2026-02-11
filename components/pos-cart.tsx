@@ -183,15 +183,31 @@ export function POSCart({
 
   return (
     <div className="h-full flex flex-col bg-white border-l-0 lg:border-l-2 border-slate-200">
-      {/* Fixed Receipt Header */}
-      <div className="bg-slate-50 border-b-2 border-slate-300 px-2 sm:px-3 md:px-4 py-2 sm:py-3 flex-shrink-0">
-        <div className="text-center">
+      {/* Cart Top Bar: Total & Checkout */}
+      <div className="flex items-center justify-between bg-slate-50 border-b-2 border-slate-300 px-2 sm:px-3 md:px-4 py-2 sm:py-3">
+        <div>
           <h2 className="text-base sm:text-lg font-bold text-slate-800">BILL</h2>
-          <div className="flex items-center justify-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-600 mt-1">
+          <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-600 mt-1">
             <span>{productCount} Products</span>
             <span>•</span>
             <span>{itemCount} Items</span>
           </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <span className="font-mono font-bold text-base sm:text-lg text-slate-900">TOTAL: Rs. {formatCurrency(total)}</span>
+          <Button
+            onClick={handleCheckout}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-xs sm:text-sm font-bold rounded shadow-md"
+            disabled={items.length === 0 || loading}
+            tabIndex={2}
+            style={{ minWidth: 100 }}
+          >
+            {loading ? 'Processing...' : (
+              <span className="flex items-center justify-center gap-1.5 sm:gap-2">
+                CHECKOUT <Kbd className="bg-white text-green-700 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">F9</Kbd>
+              </span>
+            )}
+          </Button>
         </div>
       </div>
 
@@ -354,29 +370,6 @@ export function POSCart({
             </div>
           </div>
 
-          {/* Fixed Receipt Footer - Total & Checkout */}
-          <div className="border-t-2 border-slate-300 bg-slate-50 px-2 sm:px-3 md:px-4 py-2 sm:py-3 flex-shrink-0">
-            {/* Receipt Total Line Only */}
-            <div className="mb-2 sm:mb-3 font-mono text-[13px] sm:text-base md:text-lg">
-              <div className="border-t-2 border-dashed border-slate-400 pt-2 flex justify-between font-bold text-base sm:text-lg text-slate-900">
-                <span>TOTAL:</span>
-                <span>Rs. {formatCurrency(total)}</span>
-              </div>
-            </div>
-            {/* Compact Checkout Button */}
-            <Button
-              onClick={handleCheckout}
-              className="w-full bg-green-600 hover:bg-green-700 text-white py-2.5 sm:py-3 text-xs sm:text-sm font-bold rounded shadow-md"
-              disabled={items.length === 0 || loading}
-              tabIndex={2}
-            >
-              {loading ? 'Processing...' : (
-                <span className="flex items-center justify-center gap-1.5 sm:gap-2">
-                  CHECKOUT <Kbd className="bg-white text-green-700 text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5">F9</Kbd>
-                </span>
-              )}
-            </Button>
-          </div>
         </>
       )}
 
