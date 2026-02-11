@@ -219,15 +219,25 @@ export function POSCart({
       ) : (
         <>
           {/* Scrollable Receipt Items */}
-          <div className="flex-1 overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3">
+          <div
+            className="overflow-y-auto px-2 sm:px-3 md:px-4 py-2 sm:py-3 mb-6 lg:flex-1"
+            style={{
+              height: '28vh',
+              minHeight: 180,
+              maxHeight: 320,
+              /* On laptop and up, use 100% height of parent (flex-1) */
+              /* This will be overridden by flex-1 on lg screens via Tailwind */
+            }}
+          >
             <div className="space-y-1.5 sm:space-y-2">
               {items.map((item, index) => {
                 const discount = item.discount ?? 0;
                 const discountedPrice = item.price * (1 - discount / 100);
+                const isLast = index === items.length - 1;
                 return (
                   <div
                     key={item.id}
-                    className="border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0"
+                    className={`border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0${isLast ? ' mb-8 sm:mb-10' : ''}`}
                   >
                     {/* Item Name Row */}
                     <div className="flex items-start justify-between gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
