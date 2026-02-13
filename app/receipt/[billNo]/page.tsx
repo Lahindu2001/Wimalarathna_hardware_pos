@@ -30,7 +30,7 @@ interface ReceiptData {
 // Helper to get QR value
 const getQrValue = (billNo: string) => {
   if (typeof window !== 'undefined') {
-    return `${window.location.origin}/receipt/${billNo}`
+    return `${window.location.origin}/public-bill/${billNo}`
   }
   return ''
 }
