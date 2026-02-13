@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, use } from 'react'
+import { QRCodeCanvas } from 'qrcode.react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -26,12 +27,30 @@ interface ReceiptData {
   timestamp: string
 }
 
+// Helper to get QR value
+const getQrValue = (billNo: string) => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/receipt/${billNo}`
+  }
+  return ''
+}
+
 export default function ReceiptPage({ params }: { params: Promise<{ billNo: string }> }) {
   const router = useRouter()
   const receiptRef = useRef<HTMLDivElement>(null)
+  const qrCanvasRef = useRef(null)
   const [receipt, setReceipt] = useState<ReceiptData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [qrImg, setQrImg] = useState<string | null>(null)
   const resolvedParams = use(params)
+  // Generate QR image data URL when receipt is loaded
+  useEffect(() => {
+    if (receipt && qrCanvasRef.current) {
+      // @ts-ignore
+      const url = qrCanvasRef.current.toDataURL('image/png')
+      setQrImg(url)
+    }
+  }, [receipt])
 
   // Format number with commas
   const formatCurrency = (amount: number) => {
@@ -339,6 +358,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           className="bg-white text-gray-900 mx-auto"
           style={{ width: '80mm', padding: '5mm', fontSize: '13px', fontFamily: 'Arial, sans-serif', lineHeight: '1.4' }}
         >
+          
           {/* Header */}
           <div className="text-center border-b-2 border-gray-800 pb-2 mb-2">
             <h1 className="font-bold uppercase" style={{ fontSize: '16px', letterSpacing: '0.5px' }}>
@@ -493,6 +513,25 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             ) : null}
           </div>
 
+          {/* QR Code at the top (as image for print compatibility) */}
+          <div className="mb-2" style={{ textAlign: 'center' }}>
+            {qrImg ? (
+              <img src={qrImg} alt="QR Code" width={80} height={80} style={{ display: 'inline-block' }} />
+            ) : null}
+            {/* Hidden canvas for QR generation */}
+            <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', height: 0, width: 0, overflow: 'hidden' }}>
+              {receipt && (
+                <QRCodeCanvas
+                  value={getQrValue(receipt.billNo)}
+                  size={80}
+                  level="M"
+                  includeMargin={false}
+                  ref={qrCanvasRef}
+                />
+              )}
+            </div>
+          </div>
+
           {/* Footer */}
           <div className="text-center pt-1 mt-2" style={{ fontSize: '11px' }}>
             <p style={{ marginBottom: '4px', fontWeight: '600' }}>Thank You For Your Purchase!</p>
@@ -501,6 +540,8 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
             <div className="cut-line" style={{ borderTop: '1px dashed #000', margin: '0 auto', width: '100%' }}></div>
           </div>
         </div>
+
+        
         
         {/* Empty lines after border */}
         <div style={{ fontFamily: 'Arial, sans-serif' }}>
