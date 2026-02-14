@@ -410,7 +410,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                       <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
                       <span style={{ width: '50px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px' }}>{formatCurrency(Number(item.price))}</span>
                       <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px', fontWeight: 'bold' }}>{discountRs > 0 ? formatCurrency(discountRs) : '-'}</span>
-                      <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px', fontWeight: 'bold' }}>{formatCurrency(totalWithDiscount)}</span>
+                      <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px' }}>{formatCurrency(totalWithDiscount)}</span>
                     </div>
                   </div>
                 );
