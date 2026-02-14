@@ -408,9 +408,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                     <div className="flex items-start">
                       <span className="flex-1 font-semibold">{item.name}</span>
                       <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
-                      <span style={{ width: '50px', textAlign: 'right' }}>{formatCurrency(Number(item.price))}</span>
-                      <span style={{ width: '60px', textAlign: 'right', color: discountRs > 0 ? '#d00' : '#111827', fontWeight: discountRs > 0 ? 'bold' : 'normal' }}>{discountRs > 0 ? formatCurrency(discountRs) : '-'}</span>
-                      <span style={{ width: '60px', textAlign: 'right', color: discountPercent > 0 ? '#0a0' : '#111827', fontWeight: discountPercent > 0 ? 'bold' : 'normal' }}>{formatCurrency(totalWithDiscount)}</span>
+                      <span style={{ width: '50px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px' }}>{formatCurrency(Number(item.price))}</span>
+                      <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px', fontWeight: 'bold' }}>{discountRs > 0 ? formatCurrency(discountRs) : '-'}</span>
+                      <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px', fontWeight: 'bold' }}>{formatCurrency(totalWithDiscount)}</span>
                     </div>
                   </div>
                 );
