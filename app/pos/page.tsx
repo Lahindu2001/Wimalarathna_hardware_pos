@@ -23,6 +23,66 @@ export default function POSPage() {
   const [cart, setCart] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(true)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
+  // New product form state
+  const [newProductName, setNewProductName] = useState('')
+  const [newProductPrice, setNewProductPrice] = useState('')
+  const [newProductQuantity, setNewProductQuantity] = useState('')
+  const [addProductLoading, setAddProductLoading] = useState(false)
+  const [newProductDiscount, setNewProductDiscount] = useState('0')
+  const [lastDiscount, setLastDiscount] = useState('0')
+  // Add new product to DB and cart
+  const handleAddNewProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProductName || !newProductPrice || !newProductQuantity) {
+      alert('Name, price, and quantity are required');
+      return;
+    }
+    const discount = parseFloat(newProductDiscount) || 0;
+    if (discount < 0 || discount > 100) {
+      alert('Discount must be between 0 and 100');
+      return;
+    }
+    setAddProductLoading(true);
+    try {
+      const price = parseFloat(newProductPrice);
+      const quantity = parseInt(newProductQuantity);
+      const discountablePrice = price * (1 - discount / 100);
+      // Always set stock to 9999 for product table
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newProductName, price, stock: 9999 }),
+      });
+      if (!res.ok) throw new Error('Failed to add product');
+      const product = await res.json();
+      // Add to products state
+      setProducts((prev) => [...prev, product]);
+      // Add to cart with customer quantity
+      setCart((prevCart) => [...prevCart, { ...product, quantity }]);
+        // Add discount and discountable price to cart item
+        setCart((prevCart) => {
+          const existing = prevCart.find(item => item.id === product.id);
+          if (existing) {
+            return prevCart.map(item =>
+              item.id === product.id
+                ? { ...item, quantity: item.quantity + quantity, discount, discountablePrice }
+                : item
+            );
+          }
+          return [...prevCart, { ...product, quantity, discount, discountablePrice }];
+        });
+      // Reset form
+      setNewProductName('');
+      setNewProductPrice('');
+      setNewProductQuantity('');
+      setNewProductDiscount('0');
+      setLastDiscount(newProductDiscount);
+    } catch (error) {
+      alert('Failed to add product');
+    } finally {
+      setAddProductLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProducts()
@@ -81,8 +141,18 @@ export default function POSPage() {
     )
   }
 
+
   const handleRemoveFromCart = (id: number) => {
     setCart((prevCart) => prevCart.filter((item) => item.id !== id))
+  }
+
+  // New: Update discount for a cart item
+  const handleUpdateDiscount = (id: number, discount: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id ? { ...item, discount } : item
+      )
+    );
   }
 
   const handleCheckout = async (
@@ -165,25 +235,90 @@ export default function POSPage() {
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       <AppHeader />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-0 overflow-hidden">
-        {/* Left Side - Product Selection */}
-        <div className="flex-1 bg-white shadow-sm order-2 lg:order-1 overflow-auto">
-          <POSProducts
-            products={products}
-            onAddToCart={handleAddToCart}
-            loading={checkoutLoading}
-          />
-        </div>
-        
-        {/* Right Side - Receipt Style Cart (Compact) */}
-        <div className="w-full lg:w-[380px] xl:w-[420px] bg-white shadow-2xl order-1 lg:order-2 flex flex-col max-h-[40vh] lg:max-h-none">
+      {/* Top: Temporary Cart */}
+      <div className="w-full max-w-4xl xl:max-w-5xl mx-auto mt-1 mb-1 px-2">
+        <div className="bg-white shadow-2xl rounded flex flex-col">
           <POSCart
             items={cart}
             onUpdateQuantity={handleUpdateQuantity}
             onUpdatePrice={handleUpdatePrice}
+            onUpdateDiscount={handleUpdateDiscount}
             onRemove={handleRemoveFromCart}
             onCheckout={handleCheckout}
+            loading={checkoutLoading}
+          />
+        </div>
+      </div>
+
+      {/* Below: 2 columns: left=add form (1/4), right=search/products (3/4) */}
+      <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-4 px-2">
+        {/* Left: Add Product Form (1/3) */}
+        <div className="flex-1 flex flex-col justify-start min-w-[220px] max-w-md">
+          <div className="bg-white rounded shadow-sm border border-slate-200 p-2 mt-1 mb-1">
+            <form onSubmit={handleAddNewProduct} className="flex flex-col gap-2">
+              <h2 className="text-base font-semibold mb-2 text-center">Add New Product Not In a Search list</h2>
+              <label className="text-xs font-medium mb-0.5">Product Name</label>
+              <input
+                type="text"
+                placeholder="Product Name"
+                value={newProductName}
+                onChange={e => setNewProductName(e.target.value)}
+                className="border p-2 rounded text-sm mb-1"
+                required
+              />
+              <label className="text-xs font-medium mb-0.5">Price</label>
+              <input
+                type="number"
+                placeholder="Price"
+                value={newProductPrice}
+                onChange={e => setNewProductPrice(e.target.value)}
+                className="border p-2 rounded text-sm mb-1"
+                required
+                min="0"
+                step="0.01"
+              />
+              <label className="text-xs font-medium mb-0.5">Discount (%)</label>
+              <input
+                type="number"
+                placeholder="Discount (%)"
+                value={newProductDiscount}
+                onChange={e => setNewProductDiscount(e.target.value)}
+                className="border p-2 rounded text-sm mb-1"
+                min="0"
+                max="100"
+              />
+              <label className="text-xs font-medium mb-0.5">Quantity (for cart)</label>
+              <input
+                type="number"
+                placeholder="Quantity"
+                value={newProductQuantity}
+                onChange={e => setNewProductQuantity(e.target.value)}
+                className="border p-2 rounded text-sm mb-1"
+                required
+                min="1"
+              />
+              {newProductPrice && (
+                <div className="text-xs text-gray-700 mb-1">
+                  Discountable Price: Rs. {(
+                    parseFloat(newProductPrice) * (1 - (parseFloat(newProductDiscount) || 0) / 100)
+                  ).toFixed(2)}
+                </div>
+              )}
+              <button
+                type="submit"
+                className="bg-green-600 hover:bg-green-700 text-white py-2 rounded mt-1 text-sm font-medium disabled:opacity-50 transition-colors"
+                disabled={addProductLoading}
+              >
+                {addProductLoading ? 'Adding...' : 'Add Product & Cart'}
+              </button>
+            </form>
+          </div>
+        </div>
+        {/* Right: Search and Product List (3/4) */}
+        <div className="flex-1 bg-white shadow-sm rounded flex flex-col overflow-auto min-w-[320px]">
+          <POSProducts
+            products={products}
+            onAddToCart={handleAddToCart}
             loading={checkoutLoading}
           />
         </div>

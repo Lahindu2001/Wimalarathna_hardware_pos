@@ -168,12 +168,16 @@ export function POSProducts({
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
+
+      
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-b border-blue-800">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+          
           <div>
             <h2 className="text-base sm:text-lg md:text-xl font-bold text-white">Add Products</h2>
             <p className="text-blue-100 text-xs sm:text-sm mt-1">Search and select items to add to cart</p>
           </div>
+          
           {/* Keyboard Shortcuts in Header */}
           <div className="bg-blue-800/20 rounded-lg p-2 sm:p-3 border border-blue-700/30">
             <h3 className="text-[10px] sm:text-xs font-bold text-blue-100 uppercase mb-1">Shortcuts</h3>
@@ -192,6 +196,8 @@ export function POSProducts({
               </span>
             </div>
           </div>
+
+          
         </div>
       </div>
 

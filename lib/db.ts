@@ -1,3 +1,10 @@
+export async function createProduct(name: string, price: number, stock: number = 9999) {
+  const result = await query(
+    'INSERT INTO products (name, price, stock) VALUES ($1, $2, $3) RETURNING *',
+    [name, price, stock]
+  )
+  return result.rows[0];
+}
 import { Pool } from '@neondatabase/serverless'
 
 const pool = new Pool({

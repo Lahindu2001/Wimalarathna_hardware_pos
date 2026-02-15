@@ -23,6 +23,7 @@ interface POSCartProps {
   onRemove: (id: number) => void
   onCheckout: (customerName: string, amountPaid: number, changeReturned: number, customerReturnBalance?: number, enableReturnBalance?: boolean) => void
   onUpdatePrice?: (id: number, price: number) => void
+  onUpdateDiscount?: (id: number, discount: number) => void
   loading?: boolean
 }
 
@@ -32,6 +33,7 @@ export function POSCart({
   onRemove,
   onCheckout,
   onUpdatePrice,
+  onUpdateDiscount,
   loading = false,
 }: POSCartProps) {
   // Format number with commas
@@ -234,7 +236,7 @@ export function POSCart({
                 const isLast = index === items.length - 1;
                 return (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${index}`}
                     className={`border-b border-dashed border-slate-300 pb-1.5 sm:pb-2 last:border-0${isLast ? ' mb-8 sm:mb-10' : ''}`}
                   >
                     {/* Item Name Row */}
@@ -324,9 +326,9 @@ export function POSCart({
                         <div className="flex items-center gap-0.5 ml-2">
                           <button
                             onClick={() => {
-                              if (onUpdatePrice) {
+                              if (onUpdateDiscount) {
                                 const newDiscount = Math.max(0, Math.min(100, discount - 1));
-                                onUpdatePrice(item.id, item.price);
+                                onUpdateDiscount(item.id, newDiscount);
                               }
                             }}
                             className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
@@ -342,10 +344,8 @@ export function POSCart({
                             value={discount}
                             onChange={(e) => {
                               const val = parseFloat(e.target.value);
-                              if (!isNaN(val) && val >= 0 && val <= 100) {
-                                if (onUpdatePrice) {
-                                  onUpdatePrice(item.id, item.price);
-                                }
+                              if (!isNaN(val) && val >= 0 && val <= 100 && onUpdateDiscount) {
+                                onUpdateDiscount(item.id, val);
                               }
                             }}
                             className="w-12 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
@@ -353,9 +353,9 @@ export function POSCart({
                           />
                           <button
                             onClick={() => {
-                              if (onUpdatePrice) {
+                              if (onUpdateDiscount) {
                                 const newDiscount = Math.max(0, Math.min(100, discount + 1));
-                                onUpdatePrice(item.id, item.price);
+                                onUpdateDiscount(item.id, newDiscount);
                               }
                             }}
                             className="w-4 h-4 bg-slate-200 hover:bg-blue-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
