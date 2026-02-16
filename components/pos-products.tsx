@@ -216,7 +216,13 @@ export function POSProducts({
               value={searchQuery}
               onChange={handleSearchChange}
               onKeyDown={handleSearchKeyDown}
-              onFocus={() => searchQuery && setShowResults(true)}
+              onFocus={e => {
+                if (typeof window !== 'undefined') {
+                  // Scroll the search input into view when focused
+                  e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                if (searchQuery) setShowResults(true);
+              }}
               className="pl-10 sm:pl-12 h-12 sm:h-14 text-sm sm:text-base text-slate-900 placeholder:text-slate-400 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 sm:focus:ring-4 focus:ring-blue-100 shadow-sm"
               tabIndex={1}
               autoFocus
@@ -322,7 +328,11 @@ export function POSProducts({
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                   onKeyDown={handleKeyDownOnQty}
-                  onFocus={(e) => e.target.select()}
+                  onFocus={e => {
+                    if (typeof window !== 'undefined') {
+                      e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
                   className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
                   tabIndex={2}
                 />
@@ -340,6 +350,11 @@ export function POSProducts({
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
                   onKeyDown={handleKeyDownOnPrice}
+                  onFocus={e => {
+                    if (typeof window !== 'undefined') {
+                      e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
                   className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
                   tabIndex={3}
                 />
@@ -357,6 +372,11 @@ export function POSProducts({
                   value={discount}
                   onChange={(e) => setDiscount(e.target.value)}
                   onKeyDown={handleKeyDownOnDiscount}
+                  onFocus={e => {
+                    if (typeof window !== 'undefined') {
+                      e.currentTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }}
                   className="h-10 sm:h-12 text-sm sm:text-base font-semibold text-slate-900 bg-white border-2 border-slate-300 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100 shadow-sm"
                   tabIndex={4}
                 />
