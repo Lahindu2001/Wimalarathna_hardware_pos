@@ -47,7 +47,38 @@ export default function POSPage() {
       const price = parseFloat(newProductPrice);
       const quantity = parseInt(newProductQuantity);
       const discountablePrice = price * (1 - discount / 100);
-      // Always set stock to 9999 for product table
+      if (newProductName.trim().toLowerCase() === 'other') {
+        // Add to cart only, not to product table
+        setCart((prevCart) => {
+          // Find if 'other' already exists in cart
+          const existing = prevCart.find(item => item.name.trim().toLowerCase() === 'other');
+          if (existing) {
+            return prevCart.map(item =>
+              item.name.trim().toLowerCase() === 'other'
+                ? { ...item, quantity: item.quantity + quantity, price, discount, discountablePrice }
+                : item
+            );
+          }
+          // Add new 'other' item with dummy id
+          return [...prevCart, {
+            id: -1, // dummy id for 'other'
+            name: 'other',
+            price,
+            stock: 9999,
+            quantity,
+            discount,
+            discountablePrice
+          }];
+        });
+        // Reset form
+        setNewProductName('');
+        setNewProductPrice('');
+        setNewProductQuantity('');
+        setNewProductDiscount('0');
+        setLastDiscount(newProductDiscount);
+        return;
+      }
+      // For all other products, add to DB and cart
       const res = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -55,23 +86,18 @@ export default function POSPage() {
       });
       if (!res.ok) throw new Error('Failed to add product');
       const product = await res.json();
-      // Add to products state
       setProducts((prev) => [...prev, product]);
-      // Add to cart with customer quantity
-      setCart((prevCart) => [...prevCart, { ...product, quantity }]);
-        // Add discount and discountable price to cart item
-        setCart((prevCart) => {
-          const existing = prevCart.find(item => item.id === product.id);
-          if (existing) {
-            return prevCart.map(item =>
-              item.id === product.id
-                ? { ...item, quantity: item.quantity + quantity, discount, discountablePrice }
-                : item
-            );
-          }
-          return [...prevCart, { ...product, quantity, discount, discountablePrice }];
-        });
-      // Reset form
+      setCart((prevCart) => {
+        const existing = prevCart.find(item => item.id === product.id);
+        if (existing) {
+          return prevCart.map(item =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + quantity, discount, discountablePrice }
+              : item
+          );
+        }
+        return [...prevCart, { ...product, quantity, discount, discountablePrice }];
+      });
       setNewProductName('');
       setNewProductPrice('');
       setNewProductQuantity('');
@@ -162,39 +188,48 @@ export default function POSPage() {
     customerReturnBalance?: number,
     enableReturnBalance?: boolean
   ) => {
-    if (cart.length === 0) return
+    if (cart.length === 0) return;
 
-    setCheckoutLoading(true)
+    setCheckoutLoading(true);
     try {
+      // Map cart items: for 'other' product, remove id or set id to null
+      const checkoutItems = cart.map(item => {
+        if (item.name.trim().toLowerCase() === 'other') {
+          // Remove id or set id to null for 'other'
+          const { id, ...rest } = item;
+          return { ...rest, id: null };
+        }
+        return item;
+      });
       const res = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           customerName,
-          items: cart,
+          items: checkoutItems,
           amountPaid,
           changeReturned,
           customerReturnBalance: enableReturnBalance ? customerReturnBalance : undefined,
           enableReturnBalance,
         }),
-      })
+      });
 
-      if (!res.ok) throw new Error('Checkout failed')
+      if (!res.ok) throw new Error('Checkout failed');
 
-      const data = await res.json()
+      const data = await res.json();
       // Store receipt data in session storage
-      sessionStorage.setItem(`receipt_${data.billNo}`, JSON.stringify(data))
+      sessionStorage.setItem(`receipt_${data.billNo}`, JSON.stringify(data));
       // Redirect to receipt page
-      router.push(`/receipt/${data.billNo}`)
+      router.push(`/receipt/${data.billNo}`);
       // Reset cart
-      setCart([])
+      setCart([]);
       // Refresh products to update stock
-      fetchProducts()
+      fetchProducts();
     } catch (error) {
-      console.error('[v0] Checkout error:', error)
-      alert('Checkout failed. Please try again.')
+      console.error('[v0] Checkout error:', error);
+      alert('Checkout failed. Please try again.');
     } finally {
-      setCheckoutLoading(false)
+      setCheckoutLoading(false);
     }
   }
 

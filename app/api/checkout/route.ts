@@ -50,28 +50,42 @@ export async function POST(request: NextRequest) {
     const billItems = []
 
     for (const item of items) {
-      const product = await getProduct(item.id)
-
+      // Handle 'other' product (id null)
+      if (item.id === null || item.id === undefined) {
+        const discount = item.discount ?? 0;
+        const itemTotal = item.price * item.quantity;
+        const itemDiscount = item.price * item.quantity * discount / 100;
+        subtotal += itemTotal;
+        totalDiscount += itemDiscount;
+        billItems.push({
+          id: null,
+          name: item.name || 'other',
+          price: item.price,
+          quantity: item.quantity,
+          total: itemTotal,
+          discount: discount,
+        });
+        // No stock update for 'other'
+        continue;
+      }
+      const product = await getProduct(item.id);
       if (!product) {
         return NextResponse.json(
           { error: `Product ${item.id} not found` },
           { status: 404 }
-        )
+        );
       }
-
       if (product.stock < item.quantity) {
         return NextResponse.json(
           { error: `Insufficient stock for ${product.name}` },
           { status: 400 }
-        )
+        );
       }
-
-      const discount = item.discount ?? 0
-      const itemTotal = item.price * item.quantity
-      const itemDiscount = item.price * item.quantity * discount / 100
-      subtotal += itemTotal
-      totalDiscount += itemDiscount
-
+      const discount = item.discount ?? 0;
+      const itemTotal = item.price * item.quantity;
+      const itemDiscount = item.price * item.quantity * discount / 100;
+      subtotal += itemTotal;
+      totalDiscount += itemDiscount;
       billItems.push({
         id: product.id,
         name: product.name,
@@ -79,10 +93,9 @@ export async function POST(request: NextRequest) {
         quantity: item.quantity,
         total: itemTotal,
         discount: discount,
-      })
-
+      });
       // Update stock
-      await updateProductStock(product.id, product.stock - item.quantity)
+      await updateProductStock(product.id, product.stock - item.quantity);
     }
 
     const totalAmount = subtotal - totalDiscount
