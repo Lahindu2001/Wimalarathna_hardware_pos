@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { POSProducts } from '@/components/pos-products'
 import { POSCart } from '@/components/pos-cart'
@@ -18,6 +18,9 @@ interface CartItem extends Product {
 }
 
 export default function POSPage() {
+  // Refs for auto-scroll
+  const addProductSectionRef = useRef<HTMLDivElement>(null);
+  const productListSectionRef = useRef<HTMLDivElement>(null);
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
   const [cart, setCart] = useState<CartItem[]>([])
@@ -30,6 +33,13 @@ export default function POSPage() {
   const [addProductLoading, setAddProductLoading] = useState(false)
   const [newProductDiscount, setNewProductDiscount] = useState('0')
   const [lastDiscount, setLastDiscount] = useState('0')
+  // Scroll to section when input is focused
+  const handleAddProductFocus = () => {
+    addProductSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const handleProductListFocus = () => {
+    productListSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   // Add new product to DB and cart
   const handleAddNewProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,13 +295,13 @@ export default function POSPage() {
         </div>
       </div>
 
-      {/* Below: 2 columns: left=add form (1/4), right=search/products (3/4) */}
-      <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-4 px-2">
-        {/* Left: Add Product Form (1/3) */}
-        <div className="flex-1 flex flex-col justify-start min-w-[220px] max-w-md">
-          <div className="bg-white rounded shadow-sm border border-slate-200 p-2 mt-1 mb-1">
-            <form onSubmit={handleAddNewProduct} className="flex flex-col gap-2">
-              <h2 className="text-base font-semibold mb-2 text-center">Add New Product Not In a Search list</h2>
+      {/* Main POS Columns: Add Product (2/5) | Product List (3/5) */}
+      <div className="w-full max-w-5xl mx-auto flex flex-col md:flex-row gap-6 px-2 mt-2">
+        {/* Left: Add Product Form (2/5) */}
+        <section className="md:w-2/5 w-full flex flex-col justify-start">
+          <div ref={addProductSectionRef} className="bg-white rounded-lg shadow border border-slate-200 p-6 mb-4">
+            <h2 className="text-lg font-bold mb-4 text-slate-700 border-b pb-2">Add New Product (Not in Search List)</h2>
+            <form onSubmit={handleAddNewProduct} className="flex flex-col gap-3">
               <label className="text-xs font-medium mb-0.5">Product Name</label>
               <input
                 type="text"
@@ -300,6 +310,7 @@ export default function POSPage() {
                 onChange={e => setNewProductName(e.target.value)}
                 className="border p-2 rounded text-sm mb-1"
                 required
+                onFocus={handleAddProductFocus}
               />
               <label className="text-xs font-medium mb-0.5">Price</label>
               <input
@@ -311,6 +322,7 @@ export default function POSPage() {
                 required
                 min="0"
                 step="0.01"
+                onFocus={handleAddProductFocus}
               />
               <label className="text-xs font-medium mb-0.5">Discount (%)</label>
               <input
@@ -321,6 +333,7 @@ export default function POSPage() {
                 className="border p-2 rounded text-sm mb-1"
                 min="0"
                 max="100"
+                onFocus={handleAddProductFocus}
               />
               <label className="text-xs font-medium mb-0.5">Quantity (for cart)</label>
               <input
@@ -331,6 +344,7 @@ export default function POSPage() {
                 className="border p-2 rounded text-sm mb-1"
                 required
                 min="1"
+                onFocus={handleAddProductFocus}
               />
               {newProductPrice && (
                 <div className="text-xs text-gray-700 mb-1">
@@ -348,15 +362,20 @@ export default function POSPage() {
               </button>
             </form>
           </div>
-        </div>
-        {/* Right: Search and Product List (3/4) */}
-        <div className="flex-1 bg-white shadow-sm rounded flex flex-col overflow-auto min-w-[320px]">
-          <POSProducts
-            products={products}
-            onAddToCart={handleAddToCart}
-            loading={checkoutLoading}
-          />
-        </div>
+        </section>
+        {/* Right: Search and Product List (3/5) */}
+        <section className="md:w-3/5 w-full flex flex-col">
+          <div ref={productListSectionRef} className="bg-white rounded-lg shadow border border-slate-200 p-6 mb-4 flex-1 min-h-[400px]">
+            <h2 className="text-lg font-bold mb-4 text-slate-700 border-b pb-2">Search and Select Products to Add to Cart</h2>
+            {/* If you have a search input, add onFocus={handleProductListFocus} to it. If not, you can add this to the first input in POSProducts. */}
+            <POSProducts
+              products={products}
+              onAddToCart={handleAddToCart}
+              loading={checkoutLoading}
+              onSearchFocus={handleProductListFocus}
+            />
+          </div>
+        </section>
       </div>
     </main>
   )
