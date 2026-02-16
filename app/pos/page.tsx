@@ -372,7 +372,6 @@ export default function POSPage() {
               products={products}
               onAddToCart={handleAddToCart}
               loading={checkoutLoading}
-              onSearchFocus={handleProductListFocus}
             />
           </div>
         </section>
