@@ -133,12 +133,12 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
   const addToCart = () => {
     if (!selectedProduct) return
     
-    const qty = parseInt(quantity) || 1
+    const qty = parseFloat(quantity)
     const finalPrice = parseFloat(price) || selectedProduct.price
 
-    // Validate quantity (must be at least 1, not 0)
-    if (qty < 1 || quantity === '0' || quantity === '') {
-      alert('Quantity must be at least 1')
+    // Validate quantity (must be a positive decimal, not 0 or negative)
+    if (isNaN(qty) || qty <= 0) {
+      alert('Quantity must be a positive number (decimals allowed)')
       qtyRef.current?.focus()
       return
     }
@@ -157,7 +157,6 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
     }
 
     const existingItem = cart.find(item => item.id === selectedProduct.id)
-    
     if (existingItem) {
       setCart(cart.map(item =>
         item.id === selectedProduct.id
@@ -375,21 +374,14 @@ export function POSWorkflow({ products, onCheckout, loading = false }: POSWorkfl
               </label>
               <Input
                 ref={qtyRef}
-                type="text"
-                inputMode="numeric"
+                type="number"
+                inputMode="decimal"
+                step="any"
+                min="0.01"
                 placeholder="Enter quantity..."
                 value={quantity}
-                onChange={(e) => {
-                  let value = e.target.value.replace(/\D/g, '')
-                  // Remove leading zeros
-                  value = value.replace(/^0+/, '')
-                  // If just 0, convert to empty
-                  if (value === '0') {
-                    value = ''
-                  }
-                  setQuantity(value)
-                }}
-                onFocus={(e) => e.target.select()}
+                onChange={e => setQuantity(e.target.value)}
+                onFocus={e => e.target.select()}
                 onKeyDown={handleQtyKeyDown}
                 disabled={!selectedProduct}
                 className="h-14 text-lg bg-white border-2 border-gray-300 focus:border-blue-600 disabled:bg-gray-100"

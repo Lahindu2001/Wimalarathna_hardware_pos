@@ -50,18 +50,26 @@ export async function POST(request: NextRequest) {
     const billItems = []
 
     for (const item of items) {
+      // Validate quantity as positive decimal
+      const qty = parseFloat(item.quantity)
+      if (isNaN(qty) || qty <= 0) {
+        return NextResponse.json(
+          { error: `Invalid quantity for item ${item.name || item.id}` },
+          { status: 400 }
+        );
+      }
       // Handle 'other' product (id null)
       if (item.id === null || item.id === undefined) {
         const discount = item.discount ?? 0;
-        const itemTotal = item.price * item.quantity;
-        const itemDiscount = item.price * item.quantity * discount / 100;
+        const itemTotal = item.price * qty;
+        const itemDiscount = item.price * qty * discount / 100;
         subtotal += itemTotal;
         totalDiscount += itemDiscount;
         billItems.push({
           id: null,
           name: item.name || 'other',
           price: item.price,
-          quantity: item.quantity,
+          quantity: qty,
           total: itemTotal,
           discount: discount,
         });
@@ -75,27 +83,27 @@ export async function POST(request: NextRequest) {
           { status: 404 }
         );
       }
-      if (product.stock < item.quantity) {
+      if (qty > product.stock) {
         return NextResponse.json(
           { error: `Insufficient stock for ${product.name}` },
           { status: 400 }
         );
       }
       const discount = item.discount ?? 0;
-      const itemTotal = item.price * item.quantity;
-      const itemDiscount = item.price * item.quantity * discount / 100;
+      const itemTotal = item.price * qty;
+      const itemDiscount = item.price * qty * discount / 100;
       subtotal += itemTotal;
       totalDiscount += itemDiscount;
       billItems.push({
         id: product.id,
         name: product.name,
         price: item.price, // use cart price
-        quantity: item.quantity,
+        quantity: qty,
         total: itemTotal,
         discount: discount,
       });
       // Update stock
-      await updateProductStock(product.id, product.stock - item.quantity);
+      await updateProductStock(product.id, product.stock - qty);
     }
 
     const totalAmount = subtotal - totalDiscount

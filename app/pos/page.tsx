@@ -52,10 +52,14 @@ export default function POSPage() {
       alert('Discount must be between 0 and 100');
       return;
     }
+    const quantity = parseFloat(newProductQuantity);
+    if (isNaN(quantity) || quantity <= 0) {
+      alert('Quantity must be a positive number (decimals allowed)');
+      return;
+    }
     setAddProductLoading(true);
     try {
       const price = parseFloat(newProductPrice);
-      const quantity = parseInt(newProductQuantity);
       const discountablePrice = price * (1 - discount / 100);
       if (newProductName.trim().toLowerCase() === 'other') {
         // Add to cart only, not to product table
@@ -137,20 +141,20 @@ export default function POSPage() {
     }
   }
 
-  const handleAddToCart = (product: Product) => {
+  // Accepts quantity and customPrice from POSProducts
+  const handleAddToCart = (product: Product, quantity: number = 1, customPrice?: number) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((item) => item.id === product.id)
+      const qty = isNaN(quantity) || quantity <= 0 ? 1 : quantity
       if (existingItem) {
-        if (existingItem.quantity < product.stock) {
-          return prevCart.map((item) =>
-            item.id === product.id
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          )
-        }
-        return prevCart
+        // If you want to sum quantities, use:
+        return prevCart.map((item) =>
+          item.id === product.id
+            ? { ...item, quantity: parseFloat((item.quantity + qty).toFixed(2)), price: customPrice ?? item.price }
+            : item
+        )
       }
-      return [...prevCart, { ...product, quantity: 1 }]
+      return [...prevCart, { ...product, quantity: qty, price: customPrice ?? product.price }]
     })
   }
 
@@ -159,11 +163,16 @@ export default function POSPage() {
       handleRemoveFromCart(id)
       return
     }
+    const qty = parseFloat(String(quantity))
+    if (isNaN(qty) || qty <= 0) {
+      handleRemoveFromCart(id)
+      return
+    }
     const product = products.find((p) => p.id === id)
-    if (product && quantity <= product.stock) {
+    if (product && qty <= product.stock) {
       setCart((prevCart) =>
         prevCart.map((item) =>
-          item.id === id ? { ...item, quantity } : item
+          item.id === id ? { ...item, quantity: qty } : item
         )
       )
     }
@@ -338,20 +347,33 @@ export default function POSPage() {
               <label className="text-xs font-medium mb-0.5">Quantity (for cart)</label>
               <input
                 type="number"
+                inputMode="decimal"
+                step="any"
+                min="0.01"
                 placeholder="Quantity"
                 value={newProductQuantity}
                 onChange={e => setNewProductQuantity(e.target.value)}
                 className="border p-2 rounded text-sm mb-1"
                 required
-                min="1"
                 onFocus={handleAddProductFocus}
               />
               {newProductPrice && (
-                <div className="text-xs text-gray-700 mb-1">
-                  Discountable Price: Rs. {(
-                    parseFloat(newProductPrice) * (1 - (parseFloat(newProductDiscount) || 0) / 100)
-                  ).toFixed(2)}
-                </div>
+                <>
+                  <div className="text-xs text-gray-700 mb-1">
+                    Discountable Price: Rs. {(
+                      parseFloat(newProductPrice) * (1 - (parseFloat(newProductDiscount) || 0) / 100)
+                    ).toFixed(2)}
+                  </div>
+                  <div className="text-xs text-blue-700 mb-1 font-semibold">
+                    {parseFloat(newProductQuantity) > 0 && !isNaN(parseFloat(newProductQuantity))
+                      ? `${parseFloat(newProductQuantity)} × Rs. ${(
+                          parseFloat(newProductPrice) * (1 - (parseFloat(newProductDiscount) || 0) / 100)
+                        ).toFixed(2)} = Rs. ${(
+                          parseFloat(newProductQuantity) * parseFloat(newProductPrice) * (1 - (parseFloat(newProductDiscount) || 0) / 100)
+                        ).toFixed(2)}`
+                      : ''}
+                  </div>
+                </>
               )}
               <button
                 type="submit"

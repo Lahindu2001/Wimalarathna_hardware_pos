@@ -260,39 +260,45 @@ export function POSCart({
                     <div className="flex items-center justify-between text-xs pl-5">
                       <div className="flex items-center gap-2">
                         {/* Quantity with small controls */}
-                        <div className="flex items-center gap-0.5">
-                          <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                            className="w-4 h-4 bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
-                            disabled={loading}
-                            tabIndex={-1}
-                          >
-                            −
-                          </button>
-                          <Input
-                            type="number"
-                            min="1"
-                            value={item.quantity}
-                            onChange={(e) => {
-                              const qty = parseInt(e.target.value)
-                              if (!isNaN(qty) && qty > 0) {
-                                onUpdateQuantity(item.id, qty)
-                              }
-                            }}
-                            onFocus={(e) => e.target.select()}
-                            className="w-8 text-center font-mono font-bold text-xs h-4 border border-slate-300 focus:border-blue-500 bg-white rounded px-0"
-                            tabIndex={4}
-                          />
-                          <button
-                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                            className="w-4 h-4 bg-slate-200 hover:bg-green-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-xs font-bold"
-                            disabled={loading}
-                            tabIndex={-1}
-                          >
-                            +
-                          </button>
+                        <div className="flex items-center gap-3 py-2">
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => onUpdateQuantity(item.id, parseFloat((item.quantity - 0.01).toFixed(2)))}
+                              className="w-6 h-6 bg-slate-200 hover:bg-red-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-base font-bold"
+                              disabled={loading || item.quantity <= 0.01}
+                              tabIndex={-1}
+                              style={{ fontWeight: 700 }}
+                            >
+                              −
+                            </button>
+                            <Input
+                              type="number"
+                              min="0.01"
+                              step="any"
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const qty = parseFloat(e.target.value)
+                                if (!isNaN(qty) && qty > 0) {
+                                  onUpdateQuantity(item.id, qty)
+                                }
+                              }}
+                              onFocus={(e) => e.target.select()}
+                              className="w-14 text-center font-mono font-bold text-base h-8 border border-slate-300 focus:border-blue-500 bg-white rounded px-0"
+                              tabIndex={4}
+                              style={{ fontWeight: 700 }}
+                            />
+                            <button
+                              onClick={() => onUpdateQuantity(item.id, parseFloat((item.quantity + 0.01).toFixed(2)))}
+                              className="w-6 h-6 bg-slate-200 hover:bg-green-500 hover:text-white text-slate-600 rounded flex items-center justify-center text-base font-bold"
+                              disabled={loading}
+                              tabIndex={-1}
+                              style={{ fontWeight: 700 }}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-                        <span className="text-slate-500">×</span>
+                        <span className="mx-2 text-lg font-bold text-slate-500">×</span>
                         {/* Price (editable) */}
                         {editingPrice === item.id ? (
                           <Input
@@ -309,21 +315,22 @@ export function POSCart({
                                 setPriceValue('')
                               }
                             }}
-                            className="w-20 h-5 text-xs bg-white text-slate-900 border border-blue-500 rounded px-1"
+                            className="w-24 h-8 text-base bg-white text-slate-900 border border-blue-500 rounded px-2"
                             tabIndex={3}
                             autoFocus
                           />
                         ) : (
                           <button
                             onClick={() => handlePriceEdit(item)}
-                            className="text-blue-600 hover:underline font-mono"
+                            className="text-blue-700 hover:underline font-mono text-base font-bold"
+                            style={{ minWidth: 60 }}
                           >
                             {formatCurrency(Number(item.price))}
                           </button>
                         )}
-                        <span className="text-slate-500">×</span>
+                        <span className="mx-2 text-lg font-bold text-slate-500">×</span>
                         {/* Discount (editable, with controls) */}
-                        <div className="flex items-center gap-0.5 ml-2">
+                        <div className="flex items-center gap-1 ml-2">
                           <button
                             onClick={() => {
                               if (onUpdateDiscount) {
@@ -364,12 +371,12 @@ export function POSCart({
                           >
                             +
                           </button>
-                          <span className="text-slate-500">% off</span>
+                          <span className="text-slate-500 ml-1">% off</span>
                         </div>
                       </div>
                       {/* Line Total (discounted) */}
-                      <span className="font-mono font-bold text-slate-800">
-                        {formatCurrency(discountedPrice * item.quantity)}
+                      <span className="font-mono font-bold text-slate-900 text-lg ml-6">
+                        = {formatCurrency(discountedPrice * item.quantity)}
                       </span>
                     </div>
                   </div>

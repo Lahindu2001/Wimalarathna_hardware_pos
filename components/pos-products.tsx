@@ -107,20 +107,37 @@ export function POSProducts({
 
   const handleAddToCart = () => {
     if (selectedProduct) {
-      const qty = parseInt(quantity) || 1
+      const qty = parseFloat(quantity)
       const price = parseFloat(customPrice) || selectedProduct.price
       const disc = parseFloat(discount) || 0
-      if (qty > 0 && price > 0 && qty <= selectedProduct.stock && disc >= 0 && disc <= 100) {
-        const productWithCustomPrice = { ...selectedProduct, price, discount: disc }
-        for (let i = 0; i < qty; i++) {
-          onAddToCart(productWithCustomPrice)
-        }
-        setSelectedProduct(null)
-        setQuantity('1')
-        setCustomPrice('')
-        setDiscount('0')
-        searchRef.current?.focus()
+      if (isNaN(qty) || qty <= 0) {
+        alert('Quantity must be a positive number (decimals allowed)')
+        qtyRef.current?.focus()
+        return
       }
+      if (price <= 0) {
+        alert('Price must be greater than 0')
+        priceRef.current?.focus()
+        return
+      }
+      if (qty > selectedProduct.stock) {
+        alert(`Only ${selectedProduct.stock} items available in stock`)
+        qtyRef.current?.focus()
+        return
+      }
+      if (disc < 0 || disc > 100) {
+        alert('Discount must be between 0 and 100')
+        discountRef.current?.focus()
+        return
+      }
+      const productWithCustomPrice = { ...selectedProduct, price, discount: disc }
+      // For decimals, add as a single item with decimal quantity
+      onAddToCart(productWithCustomPrice, qty)
+      setSelectedProduct(null)
+      setQuantity('1')
+      setCustomPrice('')
+      setDiscount('0')
+      searchRef.current?.focus()
     }
   }
 
@@ -323,10 +340,31 @@ export function POSProducts({
                 <Input
                   ref={qtyRef}
                   type="number"
-                  min="1"
+                  inputMode="decimal"
+                  step="any"
+                  min="0.01"
                   max={selectedProduct.stock}
                   value={quantity}
-                  onChange={(e) => setQuantity(e.target.value)}
+                  onChange={e => {
+                    // Only allow decimals, no negative or zero
+                    let val = e.target.value
+                    // Allow only valid decimal input
+                    if (/^\d*\.?\d*$/.test(val) || val === '') {
+                      setQuantity(val)
+                    }
+                  }}
+                  onBlur={e => {
+                    // Remove leading zeros and ensure valid decimal
+                    let val = e.target.value
+                    if (val && !isNaN(Number(val))) {
+                      // If 0 or less, set to empty
+                      if (Number(val) <= 0) {
+                        setQuantity('')
+                      } else {
+                        setQuantity(String(Number(val)))
+                      }
+                    }
+                  }}
                   onKeyDown={handleKeyDownOnQty}
                   onFocus={e => {
                     if (typeof window !== 'undefined') {
@@ -385,16 +423,20 @@ export function POSProducts({
 
             {/* Show discounted price summary */}
             <div className="text-sm sm:text-base font-semibold text-blue-700 text-center">
-              Discounted Price: Rs. {(() => {
+              Total: Rs. {(() => {
                 const price = parseFloat(customPrice) || selectedProduct.price;
                 const disc = parseFloat(discount) || 0;
-                return (price * (1 - disc / 100)).toFixed(2);
+                const qty = parseFloat(quantity) || 0;
+                if (qty > 0) {
+                  return (qty * price * (1 - disc / 100)).toFixed(2);
+                }
+                return '0.00';
               })()}
             </div>
 
             <Button
               onClick={handleAddToCart}
-              disabled={!selectedProduct || loading || parseInt(quantity) <= 0 || parseInt(quantity) > selectedProduct.stock || parseFloat(discount) < 0 || parseFloat(discount) > 100}
+              disabled={!selectedProduct || loading || isNaN(parseFloat(quantity)) || parseFloat(quantity) <= 0 || parseFloat(quantity) > selectedProduct.stock || parseFloat(discount) < 0 || parseFloat(discount) > 100}
               className="w-full h-10 sm:h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm sm:text-base font-bold rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98]"
               tabIndex={5}
             >
