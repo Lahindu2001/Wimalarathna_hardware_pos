@@ -407,7 +407,7 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
                   <div key={item.id} style={{ marginBottom: '4px' }}>
                     <div className="flex items-start">
                       <span className="flex-1 font-semibold">{item.name}</span>
-                      <span style={{ width: '35px', textAlign: 'center' }}>{item.quantity}</span>
+                      <span style={{ width: '35px', textAlign: 'center' }}>{Math.ceil(item.quantity)}</span>
                       <span style={{ width: '50px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px' }}>{formatCurrency(Number(item.price))}</span>
                       <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px', fontWeight: 'bold' }}>{discountRs > 0 ? formatCurrency(discountRs) : '-'}</span>
                       <span style={{ width: '60px', textAlign: 'right', fontFamily: 'Arial, sans-serif', fontSize: '13px' }}>{formatCurrency(totalWithDiscount)}</span>
@@ -421,9 +421,9 @@ export default function ReceiptPage({ params }: { params: Promise<{ billNo: stri
           {/* Summary Section */}
           <div className="border-t-2 border-gray-800 pt-1 mb-2" style={{ fontSize: '13px' }}>
             <div className="flex justify-between" style={{ marginBottom: '2px' }}>
-              <span>Total Items:</span>
+              <span>Items:</span>
               <span className="font-bold">
-                {receipt.items.reduce((sum, item) => sum + item.quantity, 0)}
+                {receipt.items.reduce((sum, item) => sum + Math.ceil(item.quantity), 0)}
               </span>
             </div>
             {/* Calculate discounted total */}

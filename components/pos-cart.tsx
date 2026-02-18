@@ -59,7 +59,9 @@ export function POSCart({
   }, 0)
   // Final total after discount
   const total = subtotal - totalDiscount
-  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0)
+  // Item count: sum of Math.ceil(quantity) for each cart line
+  const itemCount = items.reduce((sum, item) => sum + Math.ceil(item.quantity), 0)
+  // Product types: number of cart lines
   const productCount = items.length
 
   const handleCheckout = useCallback(() => {
@@ -190,7 +192,7 @@ export function POSCart({
         <div>
           <h2 className="text-base sm:text-lg font-bold text-slate-800">BILL</h2>
           <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs text-slate-600 mt-1">
-            <span>{productCount} Products</span>
+            <span>{productCount} Product Types</span>
             <span>•</span>
             <span>{itemCount} Items</span>
           </div>

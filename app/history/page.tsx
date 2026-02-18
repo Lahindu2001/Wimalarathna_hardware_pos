@@ -334,7 +334,7 @@ export default function HistoryPage() {
                           </TableCell>
                           <TableCell className="text-right text-gray-800">
                             {items.reduce(
-                              (sum: number, item: BillItem) => sum + (item.quantity || 0),
+                              (sum: number, item: BillItem) => sum + Math.ceil(item.quantity || 0),
                               0
                             )}
                           </TableCell>
